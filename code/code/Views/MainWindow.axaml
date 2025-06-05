@@ -1,0 +1,143 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:code.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="code.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Cloud Raytracer">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Row="0" 
+                   Text="{Binding Greeting}" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   Margin="0,20,0,0"
+                   FontSize="24"/>
+                   
+        <Grid Grid.Row="1" ColumnDefinitions="250,*">
+            <!-- Cloud List Panel -->
+            <Border Grid.Column="0" 
+                    BorderBrush="Gray" 
+                    BorderThickness="0,0,1,0" 
+                    Padding="10">
+                <Grid RowDefinitions="Auto,*,Auto">
+                    <TextBlock Grid.Row="0" 
+                               Text="Cloud Models" 
+                               FontWeight="Bold" 
+                               FontSize="16" 
+                               Margin="0,0,0,10"/>
+                               
+                    <ListBox Grid.Row="1" 
+                             ItemsSource="{Binding CloudViewModel.Clouds}" 
+                             SelectedItem="{Binding CloudViewModel.SelectedCloud}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                                    <TextBlock Grid.Column="1" 
+                                               Text="{Binding Type}" 
+                                               Margin="10,0,0,0" 
+                                               Foreground="Gray"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    
+                    <StackPanel Grid.Row="2" 
+                                Orientation="Horizontal" 
+                                Spacing="10" 
+                                Margin="0,10,0,0">
+                        <Button Content="New" 
+                                Command="{Binding CloudViewModel.CreateNewCloudCommand}"/>
+                        <Button Content="Delete" 
+                                Command="{Binding CloudViewModel.DeleteCloudCommand}" 
+                                CommandParameter="{Binding CloudViewModel.SelectedCloud.Id}"
+                                IsEnabled="{Binding CloudViewModel.SelectedCloud, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Cloud Details Panel -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
+                <TextBlock Grid.Row="0" 
+                           Text="Cloud Details" 
+                           FontWeight="Bold" 
+                           FontSize="16" 
+                           Margin="0,0,0,20"/>
+                           
+                <ScrollViewer Grid.Row="1">
+                    <StackPanel Spacing="15">
+                        <Grid IsVisible="{Binding CloudViewModel.SelectedCloud, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel Spacing="15">
+                                <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" 
+                                             Text="{Binding CloudViewModel.SelectedCloud.Name}"/>
+                                    
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1" 
+                                              SelectedItem="{Binding CloudViewModel.SelectedCloud.Type}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBoxItem Content="SingleScatter"/>
+                                        <ComboBoxItem Content="MultipleScatter"/>
+                                        <ComboBoxItem Content="VolumetricRender"/>
+                                    </ComboBox>
+                                    
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Created:"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" 
+                                               Text="{Binding CloudViewModel.SelectedCloud.CreatedAt}"/>
+                                </Grid>
+                                
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                    <Button Grid.Row="0" Grid.Column="0"
+                                            Content="Save Changes" 
+                                            Command="{Binding CloudViewModel.UpdateCloudCommand}"
+                                            CommandParameter="{Binding CloudViewModel.SelectedCloud}"/>
+                                            
+                                    <Button Grid.Row="0" Grid.Column="1"
+                                            Content="Render Animation" 
+                                            Command="{Binding CloudViewModel.RenderCloudAnimationCommand}"
+                                            CommandParameter="{Binding CloudViewModel.SelectedCloud}"
+                                            Margin="10,0,0,0"/>
+                                </Grid>
+                                
+                                <Border IsVisible="{Binding CloudViewModel.SelectedCloud.ImagePath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                        BorderBrush="Gray" BorderThickness="1" Padding="5"
+                                        HorizontalAlignment="Center">
+                                    <Image Source="{Binding CloudViewModel.SelectedCloud.ImagePath}"
+                                           Width="400" Height="300" Stretch="Uniform"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <TextBlock Text="Select a cloud from the list to view or edit details"
+                                   IsVisible="{Binding CloudViewModel.SelectedCloud, Converter={x:Static ObjectConverters.IsNull}}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="Gray"/>
+                    </StackPanel>
+                </ScrollViewer>
+                
+                <StackPanel Grid.Row="2">
+                    <ProgressBar IsIndeterminate="True" 
+                                 IsVisible="{Binding CloudViewModel.IsLoading}" 
+                                 Width="200" 
+                                 Height="4"
+                                 Margin="0,10,0,10"/>
+                                 
+                    <TextBlock Text="{Binding CloudViewModel.StatusMessage}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
