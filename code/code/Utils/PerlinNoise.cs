@@ -1,6 +1,6 @@
 using System;
 
-namespace code.Services;
+namespace code.Utils;
 
 public class PerlinNoise
 {

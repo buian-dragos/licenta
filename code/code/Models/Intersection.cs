@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace code.Services
+namespace code.Models
 {
     public class Intersection
     {

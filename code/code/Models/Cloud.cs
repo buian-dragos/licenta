@@ -1,6 +1,6 @@
 using System;
 
-namespace code.Domain
+namespace code.Models
 {
     // Domain entity representing a cloud model
     public class Cloud

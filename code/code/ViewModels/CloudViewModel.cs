@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using code.Domain;
+using code.Models;
 using code.Services;
 namespace code.ViewModels
 {

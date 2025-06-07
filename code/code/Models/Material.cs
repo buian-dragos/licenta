@@ -1,4 +1,4 @@
-namespace code.Services
+namespace code.Models
 {
     public class Material
     {

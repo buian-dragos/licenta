@@ -1,7 +1,7 @@
 using System;
 using SkiaSharp;
 
-namespace code.Services
+namespace code.Models
 {
     public class Color
     {

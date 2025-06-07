@@ -1,10 +1,11 @@
 using System;
-using System.Drawing;
 using SkiaSharp;
 using System.Numerics;
+using code.Models;
+// using Color = System.Drawing.Color;
 
 
-namespace code.Services
+namespace code.Utils
 {
     class RayTracer
     {

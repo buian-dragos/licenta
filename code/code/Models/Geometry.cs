@@ -1,4 +1,4 @@
-namespace code.Services
+namespace code.Models
 {
     public abstract class Geometry
     {

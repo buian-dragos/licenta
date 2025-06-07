@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using code.Domain;
+using code.Models;
+
 namespace code.Repositories
 {
     public class CloudRepository : ICloudRepository

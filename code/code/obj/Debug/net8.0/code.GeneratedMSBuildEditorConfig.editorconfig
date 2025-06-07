@@ -22,5 +22,11 @@ build_property.EnableGeneratedComInterfaceComImportInterop =
 [/home/jaffa/Projects/licenta/licenta/code/code/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/home/jaffa/Projects/licenta/licenta/code/code/Views/CreateCloudView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/home/jaffa/Projects/licenta/licenta/code/code/Views/MainWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[/home/jaffa/Projects/licenta/licenta/code/code/Views/StartView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

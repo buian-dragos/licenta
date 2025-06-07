@@ -1,0 +1,53 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:code.ViewModels"
+    x:Class="code.Views.StartView"
+    x:DataType="vm:StartViewModel"
+    Background="Transparent">
+
+    <Grid>
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="24"
+            Width="400">
+
+            <!-- Title -->
+            <TextBlock
+                Text="Raytracing: Cloud Rendering"
+                Foreground="White"
+                FontSize="32"
+                FontWeight="Bold"
+                HorizontalAlignment="Center"
+                TextAlignment="Center"/>
+
+            <!-- \u201cRender New Cloud\u201d button -->
+            <Button
+                Content="Render New Cloud"
+                Command="{Binding NavigateToCreateCloudCommand}"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Background="#2E2E2E"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Padding="16"
+                CornerRadius="8"
+                HorizontalAlignment="Center"/>
+
+            <!-- \u201cOpen cloud library\u201d button (no command yet) -->
+            <Button
+                Content="Open cloud library"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="White"
+                Background="#2E2E2E"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Padding="16"
+                CornerRadius="8"
+                HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

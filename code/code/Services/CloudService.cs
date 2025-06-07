@@ -3,8 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Numerics;
 using System.Collections.Generic;
-using code.Domain;
+using code.Models;
 using code.Repositories;
+using code.Utils;
+
 namespace code.Services
 {
     public class CloudService : ICloudService

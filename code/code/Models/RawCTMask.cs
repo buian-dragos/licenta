@@ -3,7 +3,7 @@ using System.IO;
 using System.Numerics;
 using System.Text.RegularExpressions;
 
-namespace code.Services;
+namespace code.Models;
 
 public class RawCtMask : Geometry
 {

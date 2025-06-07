@@ -1,7 +1,8 @@
 using System;
 using System.Numerics;
+using code.Utils;
 
-namespace code.Services
+namespace code.Models
 {
     public class SingleScatterCloud : Geometry
     {

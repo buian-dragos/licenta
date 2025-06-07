@@ -1,0 +1,446 @@
+<!-- File: Views/CreateCloudView.axaml -->
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:code.ViewModels"
+  x:Class="code.Views.CreateCloudView"
+  x:DataType="vm:CreateCloudViewModel"
+  Background="#0F0F0F">
+
+  <!-- ScrollViewer in case the window is smaller than content -->
+  <ScrollViewer>
+
+    <!-- Root Grid: Row0=Header, Row1=MainContent, Row2=RenderButton -->
+    <Grid
+      Margin="24"
+      RowDefinitions="Auto,*,Auto"
+      ColumnDefinitions="3*,2*"
+      RowSpacing="24"
+      ColumnSpacing="24">
+
+      <!-- ─────────── Row 0: Header ─────────── -->
+      <!-- Use a 3‐column Grid so Title is truly centered -->
+      <Grid Grid.Row="0" Grid.ColumnSpan="2">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Back Button in Column 0 -->
+        <Button
+          Name="BackButton"
+          Grid.Column="0"
+          Content="Back"
+          Command="{Binding NavigateToStartPageCommand}"
+          FontSize="14"
+          FontWeight="SemiBold"
+          Background="#2E2E2E"
+          Foreground="White"
+          Padding="8,4"
+          CornerRadius="6"
+          HorizontalContentAlignment="Center"/>
+
+        <!-- Title in Column 1, centered horizontally -->
+        <TextBlock
+          Grid.Column="1"
+          Text="Render New Cloud"
+          Foreground="White"
+          FontSize="24"
+          FontWeight="Bold"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"/>
+        
+
+      </Grid>
+
+      <!-- ─────────── Row 1, Column 0: Inputs ─────────── -->
+      <StackPanel Grid.Row="1" Grid.Column="0">
+
+        <!-- Cloud Type label -->
+        <TextBlock
+          HorizontalAlignment="Left"
+          Text="Cloud Type"
+          Foreground="White"
+          FontSize="16"
+          FontWeight="SemiBold"
+          Margin="0,0,0,8"/>
+
+        <!-- Using a Grid for exactly 2 rows of 5 buttons each -->
+        <Grid
+          HorizontalAlignment="Left"
+          Margin="0,0,0,16">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <!-- First row -->
+          <ToggleButton Grid.Row="0" Grid.Column="0"
+                        Content="Cumulonimbus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsCumulonimbusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="0" Grid.Column="1"
+                        Content="Cumulus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsCumulusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="0" Grid.Column="2"
+                        Content="Stratus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsStratusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="0" Grid.Column="3"
+                        Content="Stratocumulus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsStratocumulusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="0" Grid.Column="4"
+                        Content="Nimbostratus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsNimbostratusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+
+          <!-- Second row -->
+          <ToggleButton Grid.Row="1" Grid.Column="0"
+                        Content="Altostratus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsAltostratusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="1" Grid.Column="1"
+                        Content="Altocumulus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsAltocumulusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="1" Grid.Column="2"
+                        Content="Cirrostratus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsCirrostratusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="1" Grid.Column="3"
+                        Content="Cirrocumulus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsCirrocumulusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+          <ToggleButton Grid.Row="1" Grid.Column="4"
+                        Content="Cirrus"
+                        Width="120" Height="32"
+                        Margin="4"
+                        IsChecked="{Binding IsCirrusSelected}"
+                        Background="#2E2E2E" Foreground="White"
+                        CornerRadius="6"
+                        HorizontalContentAlignment="Left"/>
+        </Grid>
+
+        <!-- Two columns for input fields -->
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto"
+              ColumnDefinitions="Auto,Auto"
+              ColumnSpacing="40"
+              Margin="0,0,0,16">
+
+          <!-- Row 0: Altitude / Temperature -->
+          <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,16">
+            <TextBlock
+              HorizontalAlignment="Left"
+              Text="Altitude"
+              Foreground="White"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Margin="0,0,0,4"/>
+            <TextBox
+              HorizontalAlignment="Left"
+              Text="{Binding Altitude, Mode=TwoWay}"
+              Watermark="Value"
+              Background="#2E2E2E"
+              Foreground="White"
+              CornerRadius="6"
+              Padding="8"
+              Width="150"/>
+          </StackPanel>
+
+          <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,16">
+            <TextBlock
+              HorizontalAlignment="Left"
+              Text="Temperature"
+              Foreground="White"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Margin="0,0,0,4"/>
+            <TextBox
+              HorizontalAlignment="Left"
+              Text="{Binding Temperature, Mode=TwoWay}"
+              Watermark="Value"
+              Background="#2E2E2E"
+              Foreground="White"
+              CornerRadius="6"
+              Padding="8"
+              Width="150"/>
+          </StackPanel>
+
+          <!-- Row 1: Pressure / Wind Speed -->
+          <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,16">
+            <TextBlock
+              HorizontalAlignment="Left"
+              Text="Atmospheric Pressure"
+              Foreground="White"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Margin="0,0,0,4"/>
+            <TextBox
+              HorizontalAlignment="Left"
+              Text="{Binding Pressure, Mode=TwoWay}"
+              Watermark="Value"
+              Background="#2E2E2E"
+              Foreground="White"
+              CornerRadius="6"
+              Padding="8"
+              Width="150"/>
+          </StackPanel>
+
+          <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,16">
+            <TextBlock
+              HorizontalAlignment="Left"
+              Text="Wind Speed"
+              Foreground="White"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Margin="0,0,0,4"/>
+            <TextBox
+              HorizontalAlignment="Left"
+              Text="{Binding WindSpeed, Mode=TwoWay}"
+              Watermark="Value"
+              Background="#2E2E2E"
+              Foreground="White"
+              CornerRadius="6"
+              Padding="8"
+              Width="150"/>
+          </StackPanel>
+
+          <!-- Row 2: Humidity -->
+          <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,16">
+            <TextBlock
+              HorizontalAlignment="Left"
+              Text="Humidity"
+              Foreground="White"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Margin="0,0,0,4"/>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock
+                HorizontalAlignment="Left"
+                Grid.Column="0"
+                Text="0%"
+                Foreground="White"
+                VerticalAlignment="Center"/>
+              <Slider
+                HorizontalAlignment="Left"
+                Grid.Column="1"
+                Minimum="0"
+                Maximum="100"
+                Value="{Binding Humidity, Mode=TwoWay}"
+                Background="#2E2E2E"
+                CornerRadius="6"
+                Width="300"/>
+              <TextBlock
+                Grid.Column="2"
+                Text="100%"
+                Foreground="White"
+                VerticalAlignment="Center"
+                Margin="4,0,0,0"
+                />
+            </Grid>
+          </StackPanel>
+
+          <!-- Row 3: Rendering Preset / Camera Position on the same row -->
+          <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,0,0">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+              <TextBlock
+                Text="Rendering Preset"
+                Foreground="White"
+                FontSize="16"
+                FontWeight="SemiBold"
+                VerticalAlignment="Center"/>
+              
+              <!-- Info icon instead of "i" in circle -->
+              <PathIcon
+                Data="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
+                Foreground="White"
+                Width="20"
+                Height="20"
+                Margin="8,0,0,0"
+                VerticalAlignment="Center"
+                ToolTip.Tip="Fast Preset = Single Scattering&#x0a;Quality Preset = Multiple Scattering"/>
+            </StackPanel>
+
+            <WrapPanel>
+              <ToggleButton
+                Content="Fast"
+                IsChecked="{Binding IsFastRenderingSelected, Mode=TwoWay}"
+                Background="#2E2E2E"
+                Foreground="White"
+                MinWidth="70"
+                Padding="8"
+                CornerRadius="6"
+                Margin="0,0,4,0"
+                HorizontalContentAlignment="Center"/>
+              <ToggleButton
+                Content="Quality"
+                IsChecked="{Binding IsQualityRenderingSelected, Mode=TwoWay}"
+                Background="#2E2E2E"
+                Foreground="White"
+                MinWidth="70"
+                Padding="8"
+                CornerRadius="6"
+                Margin="0"
+                HorizontalContentAlignment="Center"/>
+            </WrapPanel>
+          </StackPanel>
+
+          <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,0,0,0">
+            <TextBlock
+              Text="Camera Position"
+              Foreground="White"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Margin="0,0,0,8"/>
+            
+            <!-- Ensure camera buttons are in a single row -->
+            <Grid
+              HorizontalAlignment="Center">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+
+              <ToggleButton Grid.Column="0"
+                            Content="Ground Level"
+                            Width="120" Height="32"
+                            Margin="4"
+                            IsChecked="{Binding IsGroundLevelSelected}"
+                            Background="#2E2E2E" Foreground="White"
+                            CornerRadius="6"
+                            HorizontalContentAlignment="Center"/>
+              <ToggleButton Grid.Column="1"
+                            Content="Cloud Level"
+                            Width="120" Height="32"
+                            Margin="4"
+                            IsChecked="{Binding IsCloudLevelSelected}"
+                            Background="#2E2E2E" Foreground="White"
+                            CornerRadius="6"
+                            HorizontalContentAlignment="Center"/>
+              <ToggleButton Grid.Column="2"
+                            Content="Above Clouds"
+                            Width="120" Height="32"
+                            Margin="4"
+                            IsChecked="{Binding IsAboveCloudsSelected}"
+                            Background="#2E2E2E" Foreground="White"
+                            CornerRadius="6"
+                            HorizontalContentAlignment="Center"/>
+            </Grid>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+
+      <!-- ─────────── Row 1, Column 1: Preview Pane ─────────── -->
+      <StackPanel
+        Grid.Row="1"
+        Grid.Column="1"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Center">
+
+        <TextBlock
+          Text="Preview"
+          Foreground="White"
+          FontSize="16"
+          FontWeight="SemiBold"
+          HorizontalAlignment="Center"
+          Margin="0,0,0,8"/>
+
+        <Border
+          Background="#2E2E2E"
+          CornerRadius="12"
+          Width="400"
+          Height="300"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+          <Image
+            Source="{Binding PreviewImagePath}"
+            Stretch="Uniform"/>
+        </Border>
+
+        <Button
+          Content="Generate preview"
+          Command="{Binding GeneratePreviewCommand}"
+          FontSize="16"
+          FontWeight="SemiBold"
+          Background="#2563EB"
+          Foreground="White"
+          HorizontalContentAlignment="Center"
+          VerticalContentAlignment="Center"
+          Padding="12"
+          CornerRadius="6"
+          HorizontalAlignment="Center"
+          Margin="0,8,0,0"/>
+      </StackPanel>
+
+      <!-- ─────────── Row 2: Render Button ─────────── -->
+      <Button
+        Grid.Row="2"
+        Grid.ColumnSpan="2"
+        Content="Render"
+        Command="{Binding RenderCloudCommand}"
+        FontSize="20"
+        FontWeight="SemiBold"
+        Background="#2E2E2E"
+        Foreground="White"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        Padding="16"
+        CornerRadius="8"
+        Margin="0,24,0,0"
+        HorizontalAlignment="Center"
+        Width="400"/>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

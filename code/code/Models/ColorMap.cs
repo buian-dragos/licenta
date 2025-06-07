@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace code.Services;
+namespace code.Models;
 
 public class ColorMap
 {
