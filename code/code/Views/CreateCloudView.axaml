@@ -405,7 +405,7 @@
           HorizontalAlignment="Center"
           VerticalAlignment="Center">
           <Image
-            Source="{Binding PreviewImagePath}"
+            Source="{Binding PreviewImage}"
             Stretch="Uniform"/>
         </Border>
 

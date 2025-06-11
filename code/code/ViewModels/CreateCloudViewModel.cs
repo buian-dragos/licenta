@@ -5,14 +5,26 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using code.Services;
+using code.Models;
+using Avalonia.Media.Imaging;
 
 namespace code.ViewModels
 {
     public partial class CreateCloudViewModel : ViewModelBase
     {
         private readonly CloudService _cloudService;
-        private readonly Action _onCreated;
-        private readonly Action _onCancel;
+        private readonly Action? _onCreated;
+        private readonly Action? _onCancel;
+
+        // Computed flags for UI
+        public bool IsPreviewVisible => !IsPreviewLoading;
+        public bool CanGeneratePreview => !IsPreviewLoading;
+
+        partial void OnIsPreviewLoadingChanged(bool value)
+        {
+            OnPropertyChanged(nameof(IsPreviewVisible));
+            OnPropertyChanged(nameof(CanGeneratePreview));
+        }
 
         // ─── Bound Properties ────────────────────────────────────────────
 
@@ -47,10 +59,16 @@ namespace code.ViewModels
         private int _cameraPositionIndex = 1;
 
         [ObservableProperty]
-        private string _previewImagePath;
+        private string _statusMessage;
 
         [ObservableProperty]
-        private string _statusMessage;
+        private bool _isPreviewLoading;
+
+        [ObservableProperty]
+        private Bitmap _previewImage;
+
+        [ObservableProperty]
+        private string? _previewImagePath;
 
         // Cloud Type Toggle Button Properties
         private bool _isCumulonimbusSelected;
@@ -339,8 +357,8 @@ namespace code.ViewModels
         // ─── Constructor ──────────────────────────────────────────────────
         public CreateCloudViewModel(
             CloudService cloudService,
-            Action onCreated = null,
-            Action onCancel  = null)
+            Action? onCreated = null,
+            Action? onCancel  = null)
         {
             _cloudService = cloudService;
             _onCreated    = onCreated;
@@ -428,39 +446,43 @@ namespace code.ViewModels
         [RelayCommand]
         private async Task GeneratePreviewAsync()
         {
+            IsPreviewLoading = true;
             StatusMessage = string.Empty;
 
             try
             {
                 StatusMessage = "Generating preview...";
-
-                // Build a minimal data‐transfer object for your service
-                var dto = new CloudPreviewDto
+                // Build cloud model DTO from inputs
+                var cloud = new Cloud
                 {
-                    CreatedAt           = CreatedDate.DateTime,
-                    CloudTypeIndex      = CloudTypeIndex,
-                    Altitude            = Altitude,
-                    Pressure            = Pressure,
-                    Humidity            = Humidity,
-                    Temperature         = Temperature,
-                    WindSpeed           = WindSpeed,
-                    RenderingPresetIndex = RenderingPresetIndex,
-                    CameraPositionIndex  = CameraPositionIndex
+                    Name = $"Preview_{DateTime.Now:yyyyMMdd_HHmmss}",
+                    CreatedAt = CreatedDate.DateTime,
+                    Type = (CloudType)CloudTypeIndex,
+                    Altitude = Altitude,
+                    Pressure = Pressure,
+                    Humidity = Humidity,
+                    Temperature = Temperature,
+                    WindSpeed = WindSpeed,
+                    RenderingPreset = RenderingPreset.Fast,
+                    CameraPosition = (CameraPosition)CameraPositionIndex
                 };
-
-                // Call service to generate preview (service should return a file path)
-                // var previewPath = await _cloudService.GeneratePreviewAsync(dto);
-                //
-                // PreviewImagePath = previewPath;
+                // Use service to generate single-frame preview
+                var previewPath = await _cloudService.GeneratePreviewAsync(cloud, width: 400, height: 300);
+                PreviewImagePath = previewPath;
+                PreviewImage = new Bitmap(previewPath);
                 StatusMessage = "Preview generated!";
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Preview failed: {ex.Message}";
             }
+            finally
+            {
+                IsPreviewLoading = false;
+            }
         }
 
-        // ─── RenderCloudCommand ───────────────────────────────────────────
+        // ─── RenderCloudCommand ────────────────────────────────────────────
         [RelayCommand]
         private async Task RenderCloudAsync()
         {
@@ -470,35 +492,36 @@ namespace code.ViewModels
             {
                 StatusMessage = "Creating and rendering cloud...";
 
-                var dto = new CloudRenderDto
+                // Build cloud model from inputs
+                var cloud = new Cloud
                 {
-                    CreatedAt           = CreatedDate.DateTime,
-                    CloudTypeIndex      = CloudTypeIndex,
-                    Altitude            = Altitude,
-                    Pressure            = Pressure,
-                    Humidity            = Humidity,
-                    Temperature         = Temperature,
-                    WindSpeed           = WindSpeed,
-                    RenderingPresetIndex = RenderingPresetIndex,
-                    CameraPositionIndex  = CameraPositionIndex
+                    Name = $"Cloud_{DateTime.Now:yyyyMMdd_HHmmss}",
+                    CreatedAt = CreatedDate.DateTime,
+                    Type = (CloudType)CloudTypeIndex,
+                    Altitude = Altitude,
+                    Pressure = Pressure,
+                    Humidity = Humidity,
+                    Temperature = Temperature,
+                    WindSpeed = WindSpeed,
+                    RenderingPreset = (RenderingPreset)RenderingPresetIndex,
+                    CameraPosition = (CameraPosition)CameraPositionIndex
                 };
 
-                // Add the cloud (service handles mapping indices however it likes)
-                // await _cloudService.AddCloudAsync(dto);
-                // StatusMessage = "Cloud added. Rendering animation...";
-                //
-                // await _cloudService.RenderCloudAnimationAsync(dto);
-                // StatusMessage = "Cloud rendered successfully!";
+                // Persist and render
+                await _cloudService.AddCloudAsync(cloud);
+                var frames = await _cloudService.RenderCloudAnimationAsync(cloud);
 
-                _onCreated?.Invoke();
+                // Update preview
+                PreviewImagePath = cloud.PreviewImagePath;
+                StatusMessage = $"Rendered {frames.Length} frames successfully.";
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error: {ex.Message}";
+                StatusMessage = $"Error rendering cloud: {ex.Message}";
             }
         }
 
-        // ─── CancelCommand ─────────────────────────────────────────────────
+        // ─── CancelCommand ───────────────────────────────────────────────
         [RelayCommand]
         private void NavigateToStartPage()
         {

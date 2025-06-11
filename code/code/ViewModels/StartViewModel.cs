@@ -28,7 +28,6 @@ namespace code.ViewModels
             // ─── 3. Instantiate CreateCloudViewModel with navigation callbacks ─
             CreateCloudViewModel = new CreateCloudViewModel(
                 cloudService,
-                onCreated:    () => CurrentViewModel = CloudViewModel,    // After rendering, show CloudViewModel
                 onCancel:     () => CurrentViewModel = this               // On cancel, return to start page
             );
 
@@ -51,3 +50,4 @@ namespace code.ViewModels
         }
     }
 }
+
