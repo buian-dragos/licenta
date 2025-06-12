@@ -403,7 +403,8 @@
           Width="400"
           Height="300"
           HorizontalAlignment="Center"
-          VerticalAlignment="Center">
+          VerticalAlignment="Center"
+          ClipToBounds="True">
           <Image
             Source="{Binding PreviewImage}"
             Stretch="Uniform"/>

@@ -14,8 +14,7 @@ namespace code.Models
         private readonly float   _step;          // Ray‑march step size
         private readonly Light?  _light;         // Light to shadow against (may be null)
         private readonly PerlinNoise _noise = new PerlinNoise(42);   // Deterministic noise
-
-        #region ── Construction helpers ───────────────────────────────────────────
+        
 
         public SingleScatterCloud(Vector3 center,
                                   Vector3 axes,
@@ -35,78 +34,12 @@ namespace code.Models
 
         public static SingleScatterCloud FromType(CloudType type,
                                                   Vector3   center,
-                                                  double    humidityPercent, // Added humidityPercent
+                                                  double    humidityPercent, 
                                                   Light?    light   = null,
                                                   float     step    = 0.4f)
         {
-            // Shape (km → m) and density presets gathered from WMO tech docs + typical render values
-            Vector3 axes;     // width, height, depth (m)
-            float   baseDensityFromType;  // base scattering coefficient σ_s from type
-            Color   tintFromType;     // white-ish varies toward blue/gray, alpha is base albedo
-
-            switch (type)
-            {
-                case CloudType.Cumulonimbus:    // towering thundercloud
-                    axes    = new Vector3(45, 18, 35);
-                    baseDensityFromType = 0.20f;
-                    tintFromType    = new Color(0.9, 0.9, 0.95, 0.8); // slight bluish gray
-                    break;
-
-                case CloudType.Cumulus:         // puffy fair‑weather
-                    axes    = new Vector3(35, 15, 25);
-                    baseDensityFromType = 0.12f;
-                    tintFromType    = new Color(1.0, 1.0, 1.0, 0.7);
-                    break;
-
-                case CloudType.Stratus:         // flat low‑level sheet
-                    axes    = new Vector3(60, 8, 40);
-                    baseDensityFromType = 0.10f;
-                    tintFromType    = new Color(0.95, 0.95, 1.0, 0.7);
-                    break;
-
-                case CloudType.Stratocumulus:
-                    axes    = new Vector3(55, 12, 35);
-                    baseDensityFromType = 0.13f;
-                    tintFromType    = new Color(0.96, 0.96, 1.0, 0.75);
-                    break;
-
-                case CloudType.Nimbostratus:    // rain‑bearing layer
-                    axes    = new Vector3(65, 15, 45);
-                    baseDensityFromType = 0.18f;
-                    tintFromType    = new Color(0.85, 0.85, 0.9, 0.85); // darker gray
-                    break;
-
-                case CloudType.Altostratus:
-                    axes    = new Vector3(70, 10, 50);
-                    baseDensityFromType = 0.09f;
-                    tintFromType    = new Color(0.97, 0.97, 1.0, 0.65);
-                    break;
-
-                case CloudType.Altocumulus:
-                    axes    = new Vector3(30, 10, 25);
-                    baseDensityFromType = 0.08f;
-                    tintFromType    = new Color(1.0, 1.0, 1.0, 0.6);
-                    break;
-
-                case CloudType.Cirrostratus:
-                    axes    = new Vector3(90, 6, 60);
-                    baseDensityFromType = 0.04f;
-                    tintFromType    = new Color(0.95, 0.97, 1.0, 0.4); // wispy
-                    break;
-
-                case CloudType.Cirrocumulus:
-                    axes    = new Vector3(20, 6, 15);
-                    baseDensityFromType = 0.035f;
-                    tintFromType    = new Color(0.95, 0.98, 1.0, 0.35);
-                    break;
-
-                case CloudType.Cirrus:          // high thin feathers
-                default:
-                    axes    = new Vector3(80, 5, 50);
-                    baseDensityFromType = 0.03f;
-                    tintFromType    = new Color(0.92, 0.97, 1.0, 0.3);
-                    break;
-            }
+            // Get base parameters from CloudFactory
+            var (axes, baseDensityFromType, tintFromType) = CloudFactory.GetCloudParameters(type);
 
             float humidityScale = (float)(humidityPercent / 100.0);
             float finalDensity = baseDensityFromType * humidityScale;
@@ -119,13 +52,7 @@ namespace code.Models
 
             return new SingleScatterCloud(center, axes, finalDensity, finalCloudColor, light, step);
         }
-
-        #endregion
-
-        /* ────────────────────────────────────────────────────────────────── */
-        /*  Core implementation (unchanged)                                 */
-        /* ────────────────────────────────────────────────────────────────── */
-
+        
         private bool EllipsoidRayHit(Line ray, float minDist, float maxDist,
                                      out float tEnter, out float tExit)
         {
@@ -149,28 +76,48 @@ namespace code.Models
 
         private float DensityAt(Vector3 p)
         {
+            // Transform into ellipsoid‐normalized coords
             Vector3 lp = (p - _center) / _axes;
-            float r = lp.Length();
-            if (r > 1f) return 0f;
-
-            // Layered noise for billowy look
-            float nLarge = _noise.Noise(p.X*0.05f, p.Y*0.05f, p.Z*0.05f);
-            float nMed   = _noise.Noise(p.X*0.15f, p.Y*0.15f, p.Z*0.15f);
-            float nSmall = _noise.Noise(p.X*0.30f, p.Y*0.30f, p.Z*0.30f);
-
+            float   r  = lp.Length();
+    
+            // If we’re way outside even the noisy margin, bail early
+            const float outMargin = 0.75f;             // 15% of your axes
+            if (r > 1f + outMargin) return 0f;
+    
+            // Generate layered noise
+            float nLarge = _noise.Noise(p.X * 0.05f, p.Y * 0.05f, p.Z * 0.05f);
+            float nMed   = _noise.Noise(p.X * 0.15f, p.Y * 0.15f, p.Z * 0.15f);
+            float nSmall = _noise.Noise(p.X * 0.30f, p.Y * 0.30f, p.Z * 0.30f);
+    
+            // Compute your noisy boundary (in normalized ellipsoid-space)
             float boundary = 1f
-                           + 0.3f  * _noise.Noise(lp.X*2f, lp.Y*2f, lp.Z*2f)
-                           + 0.15f * _noise.Noise(lp.X*4f, lp.Y*4f, lp.Z*4f);
-            if (r > boundary) return 0f;
-
+                             + 0.3f  * _noise.Noise(lp.X * 2f, lp.Y * 2f, lp.Z * 2f)
+                             + 0.15f * _noise.Noise(lp.X * 4f, lp.Y * 4f, lp.Z * 4f);
+    
+            // **New**: compute a sharp envelope that collapses density to zero
+            // at 'boundary' and above, but fades over 'outMargin'.
+            float envelope = (boundary - r) / outMargin;
+            // clamp to [0,1]
+            if (envelope <= 0f) return 0f;
+            if (envelope >  1f) envelope = 1f;
+    
+            // Blend noise
             float n = 0.6f + 0.35f*nLarge + 0.25f*nMed + 0.15f*nSmall;
             n = MathF.Max(0f, n);
-
-            float fade   = MathF.Pow(1f - r/boundary, 0.35f);
-            float height = MathF.Max(0f, 1f - MathF.Pow(MathF.Max(0, lp.Y + 0.3f), 2));
+    
+            // Inner fade + height fall-off unchanged
+            float fade   = MathF.Pow(1f - r/boundary, 1.5f);
+            float height = MathF.Max(0f, 1f - MathF.Pow(MathF.Max(0f, lp.Y + 0.3f), 2f));
             const float minBase = 0.03f;
-            return _baseDensity * height * (n*fade + minBase*(1f - fade));
+    
+            float rawDensity = _baseDensity
+                               * height
+                               * (n * fade + minBase * (1f - fade));
+    
+            // Apply the new envelope
+            return rawDensity * envelope;
         }
+
 
         private float LightTransmittance(Vector3 pos)
         {
@@ -211,7 +158,7 @@ namespace code.Models
                 if (Tview < 0.02f) break;
             }
 
-            if (accum.Alpha <= 0.1f) return Intersection.NONE;
+            if (accum.Alpha <= 0.00001f) return Intersection.NONE;
             accum.Alpha = 1f - Tview; // overall opacity
             return new Intersection(true, true, this, ray, t0, Vector3.Zero, Material, accum);
         }

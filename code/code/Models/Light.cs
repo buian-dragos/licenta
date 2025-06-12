@@ -8,7 +8,7 @@ namespace code.Models
         public Color Ambient { get; set; }
         public Color Diffuse { get; set; }
         public Color Specular { get; set; }
-        public double Intensity { get; set; }
+        public float Intensity { get; set; }
 
         public Light()
         {
@@ -16,10 +16,10 @@ namespace code.Models
             Ambient = new Color();
             Diffuse = new Color();
             Specular = new Color();
-            Intensity = 0;
+            Intensity = 0f;
         }
 
-        public Light(Vector3 position, Color ambient, Color diffuse, Color specular, double intensity)
+        public Light(Vector3 position, Color ambient, Color diffuse, Color specular, float intensity)
         {
             Position = position;
             Ambient = new Color(ambient);

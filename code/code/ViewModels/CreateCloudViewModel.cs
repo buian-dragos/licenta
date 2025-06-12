@@ -467,7 +467,7 @@ namespace code.ViewModels
                     CameraPosition = (CameraPosition)CameraPositionIndex
                 };
                 // Use service to generate single-frame preview
-                var previewPath = await _cloudService.GeneratePreviewAsync(cloud, width: 400, height: 300);
+                var previewPath = await _cloudService.GeneratePreviewAsync(cloud, width: 800, height: 600);
                 PreviewImagePath = previewPath;
                 PreviewImage = new Bitmap(previewPath);
                 StatusMessage = "Preview generated!";

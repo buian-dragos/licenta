@@ -5,20 +5,12 @@ namespace code.Models
 {
     public class Color
     {
-        public static readonly Color NONE = new Color(0.0, 0.0, 0.0, 0.0);
-        public static readonly Color RED = new Color(1.0, 0.0, 0.0, 1.0);
-        public static readonly Color GREEN = new Color(0.0, 1.0, 0.0, 1.0);
-        public static readonly Color BLUE = new Color(0.0, 0.0, 1.0, 1.0);
-        public static readonly Color YELLOW = new Color(1.0, 1.0, 0.0, 1.0);
-        public static readonly Color MAGENTA = new Color(1.0, 0.0, 1.0, 1.0);
-        public static readonly Color CYAN = new Color(0.0, 1.0, 1.0, 1.0);
-        public static readonly Color WHITE = new Color(1.0, 1.0, 1.0, 1.0);
-        public static readonly Color ORANGE = new Color(1.0, 0.5, 0.0, 1.0);
+        public static readonly Color NONE = new Color(0.0f, 0.0f, 0.0f, 0.0f);
 
-        public double Red { get; set; }
-        public double Green { get; set; }
-        public double Blue { get; set; }
-        public double Alpha { get; set; }
+        public float Red { get; set; }
+        public float Green { get; set; }
+        public float Blue { get; set; }
+        public float Alpha { get; set; }
 
         public Color()
         {
@@ -28,7 +20,7 @@ namespace code.Models
             Alpha = 0;
         }
 
-        public Color(double red, double green, double blue, double alpha)
+        public Color(float red, float green, float blue, float alpha)
         {
             Red = red;
             Green = green;
@@ -45,16 +37,18 @@ namespace code.Models
         }
 
         // Convert to SkiaSharp's SKColor
-        public SKColor ToSKColor()
+        
+        private static float Clamp01(float v) => v < 0f ? 0f : (v > 1f ? 1f : v);
+        private static byte ToSrgb8(float linear)
         {
-            var r = Math.Min((int)Math.Ceiling(Red * 255), 255);
-            var g = Math.Min((int)Math.Ceiling(Green * 255), 255);
-            var b = Math.Min((int)Math.Ceiling(Blue * 255), 255);
-            var a = Math.Min((int)Math.Ceiling(Alpha * 255), 255);
-
-            return new SKColor((byte)r, (byte)g, (byte)b, (byte)a);
+            linear = Clamp01(linear);
+            // simple 1/2.2 gamma — good enough for UI bitmaps
+            float srgb = MathF.Pow(linear, 1f / 2.2f);
+            return (byte)MathF.Round(srgb * 255f);
         }
-
+        
+        public SKColor ToSKColor()
+            => new SKColor(ToSrgb8(Red), ToSrgb8(Green), ToSrgb8(Blue), ToSrgb8(Alpha));
         public static Color operator +(Color a, Color b)
         {
             return new Color(a.Red + b.Red, a.Green + b.Green, a.Blue + b.Blue, a.Alpha + b.Alpha);
@@ -75,12 +69,12 @@ namespace code.Models
             return new Color(a.Red / b.Red, a.Green / b.Green, a.Blue / b.Blue, a.Alpha / b.Alpha);
         }
 
-        public static Color operator *(Color c, double k)
+        public static Color operator *(Color c, float k)
         {
             return new Color(c.Red * k, c.Green * k, c.Blue * k, c.Alpha * k);
         }
 
-        public static Color operator /(Color c, double k)
+        public static Color operator /(Color c, float k)
         {
             return new Color(c.Red / k, c.Green / k, c.Blue / k, c.Alpha / k);
         }

@@ -48,7 +48,7 @@ namespace code.Services
             CleanUpOldFrames();
 
             // Position the cloud center at its altitude
-            var cloudCenter = new Vector3(0, 0, (float)cloud.Altitude);
+            var cloudCenter = new Vector3(0, 0, 0);
 
             // Create lights
             var lights = noLights ? Array.Empty<Light>() : CreateLights();
@@ -57,7 +57,7 @@ namespace code.Services
             Func<Light?, Geometry> geometryFactory = light => // Light can be null for noLights case
             {
                 // Use SingleScatterCloud.FromType, passing humidity
-                return (Geometry)SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity, light);
+                return SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity, light);
             };
 
             // Setup ray tracer
@@ -165,24 +165,30 @@ namespace code.Services
                 200.0f
             );
 
-            // Render one frame without lights to frames directory
-            var filename = Path.Combine(_framesDirectory, "preview.png");
-            rayTracer.Render(camera, width, height, filename);
-
             // Prepare preview directory
             var previewDir = Path.Combine("..", "..", "..", "preview");
-            if (Directory.Exists(previewDir))
-                Directory.Delete(previewDir, recursive: true);
-            Directory.CreateDirectory(previewDir);
-
-            // Move the frame to preview directory
-            var dest = Path.Combine(previewDir, Path.GetFileName(filename));
-            File.Copy(filename, dest, overwrite: true);
+            if (!Directory.Exists(previewDir))
+            {
+                Directory.CreateDirectory(previewDir);
+            }
+            else
+            {
+                // Clean up old preview file if it exists
+                var oldPreviewFile = Path.Combine(previewDir, "preview.png");
+                if (File.Exists(oldPreviewFile))
+                {
+                    File.Delete(oldPreviewFile);
+                }
+            }
+            
+            // Render one frame without lights directly to preview directory
+            var previewFilePath = Path.Combine(previewDir, "preview.png");
+            rayTracer.Render(camera, width, height, previewFilePath);
 
             // Update cloud preview path
-            cloud.PreviewImagePath = dest;
+            cloud.PreviewImagePath = previewFilePath;
             await UpdateCloudAsync(cloud);
-            return dest;
+            return previewFilePath;
         }
 
         private void CleanUpOldFrames()
@@ -198,10 +204,10 @@ namespace code.Services
             {
                 new Light(
                     new Vector3(50, 80, 100),
-                    new Color(1, 1, 1, 1),
-                    new Color(1, 1, 1, 1),
-                    new Color(1, 1, 1, 1),
-                    1.5f
+                    new Color(1f, 1f, 1f, 1f),
+                    new Color(1f, 1f, 1f, 1f),
+                    new Color(1f, 1f, 1f, 1f),
+                    10.0f
                 )
             };
     }

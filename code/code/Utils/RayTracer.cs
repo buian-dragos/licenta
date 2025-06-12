@@ -109,8 +109,8 @@ namespace code.Utils
         {
             camera.Normalize();
             
-            var background = new Color(0.2, 0.2, 0.2, 1.0); // Background color
-            // var background = new Color(0.529, 0.808, 0.922, 1.0); // Sky blue background
+            var background = new Color(0.05f, 0.05f, 0.05f, 1.0f); // Updated background color to #2E2E2E
+            // var background = new Color(0.529f, 0.808f, 0.922f, 1.0f); // Sky blue background
             var image = new Image(width, height);
 
             double pixelWidth = camera.ViewPlaneWidth / width;
@@ -136,9 +136,19 @@ namespace code.Utils
 
                     if (intersection.Valid && intersection.Visible)
                     {
-                        if (intersection.Geometry is RawCtMask || intersection.Geometry is SingleScatterCloud)
+                        if (intersection.Geometry is SingleScatterCloud)
                         {
-                            pixelColor = intersection.Color;
+                            Color cloudColor = intersection.Color; // .RGB is pre-multiplied, .Alpha is overall opacity
+                            float overallCloudOpacity = cloudColor.Alpha;
+
+                            // Blend pre-multiplied cloud color with background:
+                            // FinalColor.RGB = PremultipliedCloud.RGB + Background.RGB * (1 - OverallCloudOpacity)
+                            // The Color class operators achieve this:
+                            pixelColor = cloudColor + (background * (1.0f - overallCloudOpacity));
+                            
+                            // The pixelColor.Alpha resulting from the above operation is already 1.0f.
+                            // Explicitly setting it ensures the output image pixel is fully opaque.
+                            pixelColor.Alpha = 1.0f; 
                         }
                         else
                         {
@@ -159,3 +169,4 @@ namespace code.Utils
         }
     }
 }
+

@@ -26,7 +26,7 @@ namespace code.Models
 
         public static Material FromColor(Color color)
         {
-            return new Material(color*0.1, color*0.3, color*0.5, 100);
+            return new Material(color*0.1f, color*0.3f, color*0.5f, 100);
         }
     }
 }
