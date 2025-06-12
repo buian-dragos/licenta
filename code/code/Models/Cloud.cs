@@ -57,5 +57,7 @@ namespace code.Models
         public DateTime CreatedAt { get; set; }
         
         public string? PreviewImagePath { get; set; }
+
+        public string? StoragePath { get; set; } // New property
     }
 }
