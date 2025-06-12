@@ -77,7 +77,6 @@ namespace code.ViewModels
                 WindSpeed = 5.0,
                 Humidity = 50.0,
                 RenderingPreset = RenderingPreset.Fast,
-                CameraPosition = CameraPosition.CloudLevel,
                 CreatedAt = DateTime.Now,
                 PreviewImagePath = null
             };

@@ -124,7 +124,7 @@ namespace code.Repositories
                 existingCloud.WindSpeed = cloud.WindSpeed;
                 existingCloud.Humidity = cloud.Humidity;
                 existingCloud.RenderingPreset = cloud.RenderingPreset;
-                existingCloud.CameraPosition = cloud.CameraPosition;
+                existingCloud.RenderEngine = cloud.RenderEngine;
                 existingCloud.CreatedAt = cloud.CreatedAt; // Should this be updatable? Usually not.
                 existingCloud.PreviewImagePath = cloud.PreviewImagePath;
                 // StoragePath should not change after creation.

@@ -7,7 +7,7 @@ using code.Models;
 
 namespace code.Utils
 {
-    class RayTracer
+    class RayTracer : IRenderer
     {
         private Geometry[] geometries;
         private Light[] lights;
@@ -145,7 +145,7 @@ namespace code.Utils
                             // FinalColor.RGB = PremultipliedCloud.RGB + Background.RGB * (1 - OverallCloudOpacity)
                             // The Color class operators achieve this:
                             pixelColor = cloudColor + (background * (1.0f - overallCloudOpacity));
-                            
+
                             // The pixelColor.Alpha resulting from the above operation is already 1.0f.
                             // Explicitly setting it ensures the output image pixel is fully opaque.
                             pixelColor.Alpha = 1.0f; 

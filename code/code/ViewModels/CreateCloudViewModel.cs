@@ -54,9 +54,9 @@ namespace code.ViewModels
         [ObservableProperty]
         private int _renderingPresetIndex = 1;
 
-        // 0 = GroundLevel, 1 = CloudLevel, 2 = AboveClouds
+        // 0 = CPU, 1 = GPU
         [ObservableProperty]
-        private int _cameraPositionIndex = 1;
+        private int _renderEngineIndex = 0; // Default to CPU
 
         [ObservableProperty]
         private string _statusMessage;
@@ -255,69 +255,41 @@ namespace code.ViewModels
             }
         }
 
-        // Camera Position Toggle Button Properties
-        private bool _isGroundLevelSelected;
-        public bool IsGroundLevelSelected
+        // Render Engine Toggle Button Properties
+        private bool _isCpuRenderEngineSelected = true; // Default to CPU
+        public bool IsCpuRenderEngineSelected
         {
-            get => _isGroundLevelSelected;
+            get => _isCpuRenderEngineSelected;
             set
             {
-                if (SetProperty(ref _isGroundLevelSelected, value) && value)
+                if (SetProperty(ref _isCpuRenderEngineSelected, value) && value)
                 {
-                    // If Ground Level is selected, deselect others and update index
-                    IsCloudLevelSelected = false;
-                    IsAboveCloudsSelected = false;
-                    CameraPositionIndex = 0;
+                    IsGpuRenderEngineSelected = false;
+                    RenderEngineIndex = 0;
                 }
-                else if (!value && !IsCloudLevelSelected && !IsAboveCloudsSelected)
+                else if (!value && !IsGpuRenderEngineSelected)
                 {
-                    // Prevent deselecting all - if this one is deselected and no others are selected, reselect this one
-                    _isGroundLevelSelected = true;
-                    OnPropertyChanged(nameof(IsGroundLevelSelected));
+                    _isCpuRenderEngineSelected = true;
+                    OnPropertyChanged(nameof(IsCpuRenderEngineSelected));
                 }
             }
         }
 
-        private bool _isCloudLevelSelected = true; // Default to Cloud Level
-        public bool IsCloudLevelSelected
+        private bool _isGpuRenderEngineSelected;
+        public bool IsGpuRenderEngineSelected
         {
-            get => _isCloudLevelSelected;
+            get => _isGpuRenderEngineSelected;
             set
             {
-                if (SetProperty(ref _isCloudLevelSelected, value) && value)
+                if (SetProperty(ref _isGpuRenderEngineSelected, value) && value)
                 {
-                    // If Cloud Level is selected, deselect others and update index
-                    IsGroundLevelSelected = false;
-                    IsAboveCloudsSelected = false;
-                    CameraPositionIndex = 1;
+                    IsCpuRenderEngineSelected = false;
+                    RenderEngineIndex = 1;
                 }
-                else if (!value && !IsGroundLevelSelected && !IsAboveCloudsSelected)
+                else if (!value && !IsCpuRenderEngineSelected)
                 {
-                    // Prevent deselecting all - if this one is deselected and no others are selected, reselect this one
-                    _isCloudLevelSelected = true;
-                    OnPropertyChanged(nameof(IsCloudLevelSelected));
-                }
-            }
-        }
-
-        private bool _isAboveCloudsSelected;
-        public bool IsAboveCloudsSelected
-        {
-            get => _isAboveCloudsSelected;
-            set
-            {
-                if (SetProperty(ref _isAboveCloudsSelected, value) && value)
-                {
-                    // If Above Clouds is selected, deselect others and update index
-                    IsGroundLevelSelected = false;
-                    IsCloudLevelSelected = false;
-                    CameraPositionIndex = 2;
-                }
-                else if (!value && !IsGroundLevelSelected && !IsCloudLevelSelected)
-                {
-                    // Prevent deselecting all - if this one is deselected and no others are selected, reselect this one
-                    _isAboveCloudsSelected = true;
-                    OnPropertyChanged(nameof(IsAboveCloudsSelected));
+                    _isGpuRenderEngineSelected = true;
+                    OnPropertyChanged(nameof(IsGpuRenderEngineSelected));
                 }
             }
         }
@@ -352,7 +324,7 @@ namespace code.ViewModels
         // Arrays of labels for binding toggle‐button Content
         public string[] CloudTypeLabels { get; } = new[] { "SingleScatter", "MultipleScatter", "VolumetricRender" };
         public string[] RenderingPresetLabels { get; } = new[] { "Fast", "Quality" };
-        public string[] CameraPositionLabels { get; } = new[] { "Ground Level", "Cloud Level", "Above Clouds" };
+        public string[] RenderEngineLabels { get; } = new[] { "CPU", "GPU" };
 
         // ─── Constructor ──────────────────────────────────────────────────
         public CreateCloudViewModel(
@@ -413,10 +385,9 @@ namespace code.ViewModels
             IsFastRenderingSelected = RenderingPresetIndex == 0;
             IsQualityRenderingSelected = RenderingPresetIndex == 1;
 
-            // Set camera position toggle states
-            IsGroundLevelSelected = CameraPositionIndex == 0;
-            IsCloudLevelSelected = CameraPositionIndex == 1;
-            IsAboveCloudsSelected = CameraPositionIndex == 2;
+            // Set render engine toggle states
+            IsCpuRenderEngineSelected = RenderEngineIndex == 0;
+            IsGpuRenderEngineSelected = RenderEngineIndex == 1;
         }
 
         // ─── Commands to set toggle‐button indices ─────────────────────────
@@ -436,9 +407,9 @@ namespace code.ViewModels
         }
 
         [RelayCommand]
-        private void SetCameraPositionIndex(int index)
+        private void SetRenderEngineIndex(int index)
         {
-            CameraPositionIndex = index;
+            RenderEngineIndex = index;
             UpdateToggleButtonStatesFromIndices();
         }
 
@@ -464,7 +435,7 @@ namespace code.ViewModels
                     Temperature = Temperature,
                     WindSpeed = WindSpeed,
                     RenderingPreset = RenderingPreset.Fast,
-                    CameraPosition = (CameraPosition)CameraPositionIndex
+                    RenderEngine = (RenderEngineType)RenderEngineIndex // Set RenderEngine for preview
                 };
                 // Use service to generate single-frame preview
                 var previewPath = await _cloudService.GeneratePreviewAsync(cloud, width: 800, height: 600);
@@ -504,7 +475,7 @@ namespace code.ViewModels
                     Temperature = Temperature,
                     WindSpeed = WindSpeed,
                     RenderingPreset = (RenderingPreset)RenderingPresetIndex,
-                    CameraPosition = (CameraPosition)CameraPositionIndex
+                    RenderEngine = (RenderEngineType)RenderEngineIndex // Set RenderEngine for full render
                 };
 
                 // Persist and render
@@ -550,7 +521,7 @@ namespace code.ViewModels
         public double Temperature { get; set; }
         public double WindSpeed { get; set; }
         public int RenderingPresetIndex { get; set; }
-        public int CameraPositionIndex { get; set; }
+        public int RenderEngineIndex { get; set; } // Added for DTO
     }
 
     public class CloudRenderDto : CloudPreviewDto

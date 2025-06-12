@@ -291,7 +291,7 @@
             </Grid>
           </StackPanel>
 
-          <!-- Row 3: Rendering Preset / Camera Position on the same row -->
+          <!-- Row 3: Rendering Preset / Render Engine on the same row -->
           <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,0,0">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
               <TextBlock
@@ -338,42 +338,31 @@
 
           <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,0,0,0">
             <TextBlock
-              Text="Camera Position"
+              Text="Render Engine"
               Foreground="White"
               FontSize="16"
               FontWeight="SemiBold"
               Margin="0,0,0,8"/>
             
-            <!-- Ensure camera buttons are in a single row -->
-            <Grid
-              HorizontalAlignment="Center">
+            <Grid HorizontalAlignment="Left">
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
               </Grid.ColumnDefinitions>
 
               <ToggleButton Grid.Column="0"
-                            Content="Ground Level"
+                            Content="CPU"
                             Width="120" Height="32"
                             Margin="4"
-                            IsChecked="{Binding IsGroundLevelSelected}"
+                            IsChecked="{Binding IsCpuRenderEngineSelected}"
                             Background="#2E2E2E" Foreground="White"
                             CornerRadius="6"
                             HorizontalContentAlignment="Center"/>
               <ToggleButton Grid.Column="1"
-                            Content="Cloud Level"
+                            Content="GPU"
                             Width="120" Height="32"
                             Margin="4"
-                            IsChecked="{Binding IsCloudLevelSelected}"
-                            Background="#2E2E2E" Foreground="White"
-                            CornerRadius="6"
-                            HorizontalContentAlignment="Center"/>
-              <ToggleButton Grid.Column="2"
-                            Content="Above Clouds"
-                            Width="120" Height="32"
-                            Margin="4"
-                            IsChecked="{Binding IsAboveCloudsSelected}"
+                            IsChecked="{Binding IsGpuRenderEngineSelected}"
                             Background="#2E2E2E" Foreground="White"
                             CornerRadius="6"
                             HorizontalContentAlignment="Center"/>

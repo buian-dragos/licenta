@@ -50,4 +50,3 @@ namespace code.ViewModels
         }
     }
 }
-

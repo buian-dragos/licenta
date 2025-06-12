@@ -32,6 +32,12 @@ namespace code.Models
         AboveClouds
     }
 
+    public enum RenderEngineType // New Enum
+    {
+        CPU,
+        GPU
+    }
+
     public class Cloud
     {
         public int Id { get; set; }
@@ -52,12 +58,13 @@ namespace code.Models
 
         public RenderingPreset RenderingPreset { get; set; }
         
-        public CameraPosition CameraPosition { get; set; }
+        // public CameraPosition CameraPosition { get; set; } // This was removed as per user's previous request implicitly by removing UI for it
+        public RenderEngineType RenderEngine { get; set; } // New Property
 
         public DateTime CreatedAt { get; set; }
         
         public string? PreviewImagePath { get; set; }
 
-        public string? StoragePath { get; set; } // New property
+        public string? StoragePath { get; set; }
     }
 }

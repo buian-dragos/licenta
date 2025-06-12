@@ -84,7 +84,15 @@ namespace code.Services
                 foreach (var light in lights) geometries.Add(geometryFactory(light));
             }
 
-            var rayTracer = new RayTracer(geometries.ToArray(), lights);
+            IRenderer localRenderer;
+            if (cloud.RenderEngine == RenderEngineType.GPU)
+            {
+                localRenderer = new OpenGLRenderer(geometries.ToArray(), lights);
+            }
+            else // Default to CPU
+            {
+                localRenderer = new RayTracer(geometries.ToArray(), lights);
+            }
 
             var up = Vector3.UnitY;
             float cameraDist = 60.0f;
@@ -103,13 +111,8 @@ namespace code.Services
                     float camX = (float)Math.Cos(angleRad) * cameraDist;
                     float camZ = (float)Math.Sin(angleRad) * cameraDist + cloudCenter.Z;
 
-                    float camY = cloudCenter.Y;
-                    switch (cloud.CameraPosition)
-                    {
-                        case CameraPosition.GroundLevel: camY = 0; break;
-                        case CameraPosition.CloudLevel: camY = (float)cloud.Altitude; break;
-                        case CameraPosition.AboveClouds: camY = (float)cloud.Altitude + 20; break;
-                    }
+                    // Default camera Y position to cloud altitude as CameraPosition is removed
+                    float camY = (float)cloud.Altitude;
 
                     var camPos = new Vector3(camX, camY, camZ);
                     var dir = Vector3.Normalize(new Vector3(cloudCenter.X, (float)cloud.Altitude, cloudCenter.Z) - camPos);
@@ -120,7 +123,7 @@ namespace code.Services
                         0.0f, 200.0f
                     );
 
-                    rayTracer.Render(camera, width, height, filenames[idx]);
+                    localRenderer.Render(camera, width, height, filenames[idx]);
                     Console.WriteLine($"Frame {idx + 1}/{nFrames} for cloud {cloud.Id} completed: {filenames[idx]}");
                 }));
             }
@@ -173,8 +176,17 @@ namespace code.Services
             // Rendering logic using 'cloud' parameter's properties (Type, Humidity, Altitude etc.)
             var cloudCenter = new Vector3(0, 0, (float)cloud.Altitude); // Use altitude from input 'cloud'
             var geometry = SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity, light: null); // No light for preview
-            var rayTracer = new RayTracer(new Geometry[] { geometry }, Array.Empty<Light>());
-
+            
+            IRenderer localRenderer;
+            if (cloud.RenderEngine == RenderEngineType.GPU)
+            {
+                localRenderer = new OpenGLRenderer(new Geometry[] { geometry }, Array.Empty<Light>());
+            }
+            else // Default to CPU
+            {
+                localRenderer = new RayTracer(new Geometry[] { geometry }, Array.Empty<Light>());
+            }
+            
             var up = Vector3.UnitY;
             float cameraDist = 60.0f;
             // Fixed camera position for preview, using altitude from the input 'cloud'
@@ -187,7 +199,7 @@ namespace code.Services
                 0.0f, 200.0f // near/far planes
             );
             
-            rayTracer.Render(camera, width, height, previewFilePath);
+            localRenderer.Render(camera, width, height, previewFilePath);
             Console.WriteLine($"Preview generated for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} at {previewFilePath}");
 
             // Update the PreviewImagePath on the cloud object passed in (which might be a ViewModel's DTO)
