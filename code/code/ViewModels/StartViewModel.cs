@@ -18,6 +18,7 @@ namespace code.ViewModels
         public CloudViewModel CloudViewModel { get; }
         public CreateCloudViewModel CreateCloudViewModel { get; }
         public CloudLibraryViewModel CloudLibraryViewModel { get; }
+        public CloudDetailViewModel? CloudDetailViewModel { get; private set; } // Property to hold the instance
 
         public StartViewModel()
         {
@@ -37,14 +38,11 @@ namespace code.ViewModels
 
             // ─── 4. Instantiate CloudLibraryViewModel ───────────────────────
             // Define the action for when a cloud is selected for display
-            Action<Cloud> displayCloudAction = (selectedCloud) => 
+            Action<Cloud> displayCloudAction = (selectedCloud) =>
             {
-                // Here you would navigate to a view that shows cloud details.
-                // For now, let's just print to console or set a placeholder view.
-                Console.WriteLine($"Navigate to display cloud: {selectedCloud.Name}");
-                // Example: If you have a ViewModel to display a single cloud:
-                // var detailViewModel = new CloudDetailViewModel(selectedCloud, cloudService);
-                // CurrentViewModel = detailViewModel;
+                // Instantiate CloudDetailViewModel with the selected cloud and navigation callback
+                this.CloudDetailViewModel = new CloudDetailViewModel(selectedCloud, cloudService, () => CurrentViewModel = CloudLibraryViewModel);
+                CurrentViewModel = this.CloudDetailViewModel; // Navigate to the detail view
             };
 
             CloudLibraryViewModel = new CloudLibraryViewModel(

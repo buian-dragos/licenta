@@ -114,10 +114,7 @@
         <TextBlock Text="{Binding CurrentPage, StringFormat='Page {0}'}" Foreground="#AAA" VerticalAlignment="Center"/>
         <TextBlock Text="of" Foreground="#888" VerticalAlignment="Center"/>
         <TextBlock Text="{Binding TotalPages}" Foreground="#AAA" VerticalAlignment="Center"/>
-
-        <!-- Example of specific page buttons (can be generated dynamically in a real app) -->
-        <!-- For simplicity, we are not generating dynamic page buttons here -->
-        <!-- You could use an ItemsControl bound to a collection of page numbers if needed -->
+        
 
         <Button Content="Next &#x2192;" Command="{Binding NextPageCommand}" Background="#2E2E2E" Foreground="White" Padding="8,4" CornerRadius="6"/>
       </StackPanel>
