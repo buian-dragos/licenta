@@ -94,11 +94,11 @@
                 </StackPanel>
                 <TextBlock Text="Technical details" FontWeight="SemiBold" Foreground="White" FontSize="14" Margin="0,24,0,12"/>
                 <StackPanel Spacing="2">
-                    <TextBlock Text="Rendering algorithm:" FontWeight="Bold" Foreground="#CCC" FontSize="13"/>
+                    <TextBlock Text="Render engine:" FontWeight="Bold" Foreground="#CCC" FontSize="13"/>
                     <TextBlock Text="{Binding RenderEngine}" Foreground="White" FontSize="13"/>
-                    <TextBlock Text="Camera position:" FontWeight="Bold" Foreground="#CCC" FontSize="13" Margin="0,8,0,0"/>
+                    <TextBlock Text="Rendering Preset:" FontWeight="Bold" Foreground="#CCC" FontSize="13" Margin="0,8,0,0"/>
                     <TextBlock Text="{Binding RenderingPreset}" Foreground="White" FontSize="13"/>
-                    <TextBlock Text="Seed:" FontWeight="Bold" Foreground="#CCC" FontSize="13" Margin="0,8,0,0"/>
+                    <TextBlock Text="Created at:" FontWeight="Bold" Foreground="#CCC" FontSize="13" Margin="0,8,0,0"/>
                     <TextBlock Text="{Binding CreatedAt}" Foreground="White" FontSize="13"/>
                 </StackPanel>
             </StackPanel>
