@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mapsui="clr-namespace:Mapsui.UI.Avalonia;assembly=Mapsui.UI.Avalonia"
+        x:Class="code.Views.WeatherLocationPickerDialog"
+        Width="800" Height="600"
+        WindowStartupLocation="CenterOwner"
+        Title="Pick a Location">
+    <Grid RowDefinitions="*,Auto">
+        <!-- the map -->
+        <mapsui:MapControl x:Name="MapControl"
+                           Grid.Row="0"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"/>
+        <!-- OK / Cancel -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="10">
+            <Button Content="Cancel" Click="Cancel_Click" Margin="0,0,5,0"/>
+            <Button Content="OK"     Click="Ok_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

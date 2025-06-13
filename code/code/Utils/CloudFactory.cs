@@ -3,11 +3,6 @@ using code.Models;
 
 namespace code.Utils
 {
-    /// <summary>
-    /// Compact presets tuned for a typical 800×600 render.
-    /// Axes are already in metres; the widest cloud is ~70 m in model space so
-    /// it fits comfortably in camera with a 65° FOV at 60 m distance.
-    /// </summary>
     public static class CloudFactory
     {
         public static (Vector3 Axes, float BaseDensity, Color Tint) GetCloudParameters(CloudType type)

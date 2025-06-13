@@ -67,6 +67,18 @@
               "target": "Package",
               "version": "[8.2.1, )"
             },
+            "Mapsui": {
+              "target": "Package",
+              "version": "[4.1.9, )"
+            },
+            "Mapsui.Avalonia": {
+              "target": "Package",
+              "version": "[4.1.9, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
             "OpenTK": {
               "target": "Package",
               "version": "[4.9.4, )"

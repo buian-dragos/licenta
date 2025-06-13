@@ -251,43 +251,51 @@
               Width="150"/>
           </StackPanel>
 
-          <!-- Row 2: Humidity -->
+          <!-- Row 2: Humidity + Import Button -->
           <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,16">
             <TextBlock
-              HorizontalAlignment="Left"
               Text="Humidity"
               Foreground="White"
               FontSize="16"
               FontWeight="SemiBold"
               Margin="0,0,0,4"/>
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-              </Grid.ColumnDefinitions>
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                  ColumnSpacing="8"
+                  VerticalAlignment="Center">
+
+              <!-- 0% label -->
               <TextBlock
-                HorizontalAlignment="Left"
                 Grid.Column="0"
                 Text="0%"
                 Foreground="White"
                 VerticalAlignment="Center"/>
+
+              <!-- Slider now fills available space -->
               <Slider
-                HorizontalAlignment="Left"
                 Grid.Column="1"
                 Minimum="0"
                 Maximum="100"
                 Value="{Binding Humidity, Mode=TwoWay}"
                 Background="#2E2E2E"
-                CornerRadius="6"
-                Width="300"/>
+                CornerRadius="6"/>
+
+              <!-- 100% label -->
               <TextBlock
                 Grid.Column="2"
                 Text="100%"
                 Foreground="White"
-                VerticalAlignment="Center"
-                Margin="4,0,0,0"
-                />
+                VerticalAlignment="Center"/>
+
+              <!-- Moved here in its own column -->
+              <Button
+                Grid.Column="3"
+                Content="Import Weather Data"
+                Command="{Binding ImportWeatherDataCommand}"
+                Background="#2E2E2E"
+                Foreground="White"
+                Padding="8"
+                CornerRadius="6"
+                VerticalAlignment="Center"/>
             </Grid>
           </StackPanel>
 
@@ -309,7 +317,7 @@
                 Height="20"
                 Margin="8,0,0,0"
                 VerticalAlignment="Center"
-                ToolTip.Tip="Fast Preset = Single Scattering&#x0a;Quality Preset = Multiple Scattering"/>
+                ToolTip.Tip="Fast Preset = 36 frames&#x0a;Quality Preset = 360 frames (not recommended for CPU rendering)"/>
             </StackPanel>
 
             <WrapPanel>

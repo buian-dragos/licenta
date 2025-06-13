@@ -9,8 +9,10 @@
         <entry key="code/Views/CreateCloudView.axaml" value="code/code.csproj" />
         <entry key="code/Views/CreateCloudWindow.axaml" value="code/code.csproj" />
         <entry key="code/Views/MainWindow.axaml" value="code/code.csproj" />
+        <entry key="code/Views/MapDialogView.axaml" value="code/code.csproj" />
         <entry key="code/Views/StartView.axaml" value="code/code.csproj" />
         <entry key="code/Views/UserControl1.axaml" value="code/code.csproj" />
+        <entry key="code/Views/WeatherLocationPickerDialog.axaml" value="code/code.csproj" />
       </map>
     </option>
   </component>

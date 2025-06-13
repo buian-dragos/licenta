@@ -7,30 +7,33 @@ namespace code.Models
 
     public class SingleScatterCloud : Geometry
     {
-        private readonly Vector3 _center;
-        private readonly Vector3 _axes;          // Ellipsoid axes (width, height, depth)
-        private readonly float   _baseDensity;   // Base σ_s inside the cloud
-        private readonly Color   _cloudColor;    // RGB of the cloud (alpha = single‑scatter albedo)
-        private readonly float   _step;          // Ray‑march step size
-        private readonly Light?  _light;         // Light to shadow against (may be null)
-        private readonly PerlinNoise _noise = new PerlinNoise(42);   // Deterministic noise
-        
+        private readonly Vector3    _center;
+        private readonly Vector3    _axes;
+        private readonly float      _baseDensity;
+        private readonly Color      _cloudColor;
+        private readonly float      _step;
+        private readonly Light?     _light;
+        private readonly float      _temperature;
+        private readonly float      _windSpeed;
+        private readonly PerlinNoise _noise = new PerlinNoise(42);
 
-        // ——— GPU accessors ———
+        // GPU accessors
         public Vector3 Center      => _center;
         public Vector3 Axes        => _axes;
         public float   BaseDensity => _baseDensity;
         public Color   CloudColor  => _cloudColor;
         public float   Step        => _step;
 
-        
-        public SingleScatterCloud(Vector3 center,
-                                  Vector3 axes,
-                                  float   baseDensity,
-                                  Color   cloudColor,
-                                  Light?  light = null,
-                                  float   step  = 0.4f)
-            : base(Color.NONE)
+        public SingleScatterCloud(
+            Vector3 center,
+            Vector3 axes,
+            float   baseDensity,
+            Color   cloudColor,
+            Light?  light       = null,
+            float   step        = 0.4f,
+            float   temperature = 20f,
+            float   windSpeed   = 0f
+        ) : base(Color.NONE)
         {
             _center      = center;
             _axes        = axes;
@@ -38,28 +41,56 @@ namespace code.Models
             _cloudColor  = cloudColor;
             _light       = light;
             _step        = step;
+            _temperature = temperature;
+            _windSpeed   = windSpeed;
         }
 
-        public static SingleScatterCloud FromType(CloudType type,
-                                                  Vector3   center,
-                                                  double    humidityPercent, 
-                                                  Light?    light   = null,
-                                                  float     step    = 0.4f)
+        public static SingleScatterCloud FromType(
+            CloudType type,
+            Vector3   center,
+            double    humidityPercent,
+            double    temperature,
+            double    windSpeed,
+            Light?    light = null,
+            float     step  = 0.4f
+        )
         {
-            // Get base parameters from CloudFactory
-            var (axes, baseDensityFromType, tintFromType) = CloudFactory.GetCloudParameters(type);
+            // 1) Base WMO parameters
+            var (axes, baseDensity, tint) = CloudFactory.GetCloudParameters(type);
 
-            float humidityScale = (float)(humidityPercent / 100.0);
-            float finalDensity = baseDensityFromType * humidityScale;
-            Color finalCloudColor = new Color(
-                tintFromType.Red,
-                tintFromType.Green,
-                tintFromType.Blue,
-                Math.Clamp((float)tintFromType.Alpha * humidityScale, 0.0f, 1.0f) // Modulate albedo and clamp
+            // 2) Temperature → ice clouds if below 0°C
+            if (temperature < 0)
+            {
+                baseDensity *= 0.6f;  // optically thinner
+                tint = new Color(
+                    tint.Red   * 0.85f,
+                    tint.Green * 0.90f,
+                    tint.Blue  * 1.10f,  // slight blue shift
+                    tint.Alpha * 0.6f
+                );
+            }
+
+            // 3) Wind → stretch X/Z
+            float stretch = 1f + 0.02f * (float)windSpeed;  // 2% per m/s
+            axes.X *= stretch;
+            axes.Z *= stretch;
+
+            // 4) Humidity → final density & alpha
+            float hScale = (float)(humidityPercent / 100.0);
+            float finalDensity = baseDensity * hScale;
+            var finalColor = new Color(
+                tint.Red,
+                tint.Green,
+                tint.Blue,
+                Math.Clamp(tint.Alpha * hScale, 0f, 1f)
             );
 
-            return new SingleScatterCloud(center, axes, finalDensity, finalCloudColor, light, step);
+            return new SingleScatterCloud(
+                center, axes, finalDensity, finalColor,
+                light, step, (float)temperature, (float)windSpeed
+            );
         }
+
         
         private bool EllipsoidRayHit(Line ray, float minDist, float maxDist,
                                      out float tEnter, out float tExit)

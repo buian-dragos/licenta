@@ -1,12 +1,17 @@
 // File: ViewModels/CreateCloudViewModel.cs
 
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using code.Services;
 using code.Models;
 using Avalonia.Media.Imaging;
+using code.Views;
+using Avalonia; // Added
+using Avalonia.Controls; // Added
+using Avalonia.Controls.ApplicationLifetimes; // Added
 
 namespace code.ViewModels
 {
@@ -52,7 +57,7 @@ namespace code.ViewModels
 
         // 0 = Fast, 1 = Quality
         [ObservableProperty]
-        private int _renderingPresetIndex = 1;
+        private int _renderingPresetIndex = 0;
 
         // 0 = CPU, 1 = GPU
         [ObservableProperty]
@@ -453,7 +458,7 @@ namespace code.ViewModels
             }
         }
 
-        // ─── RenderCloudCommand ────────────────────────────────────────────
+        // ─── RenderCloudCommand ───────────────────────────────────────────
         [RelayCommand]
         private async Task RenderCloudAsync()
         {
@@ -480,8 +485,12 @@ namespace code.ViewModels
 
                 // Persist and render
                 await _cloudService.AddCloudAsync(cloud);
-                var frames = await _cloudService.RenderCloudAnimationAsync(cloud);
+                // var frames = await _cloudService.RenderCloudAnimationAsync(cloud);
 
+                int nFrames = RenderingPresetIndex == 0 ? 36 : 360; // 0=Fast, 1=Quality
+                var frames = await _cloudService.RenderCloudAnimationAsync(cloud, nFrames: nFrames);
+
+                
                 // Update preview
                 PreviewImagePath = cloud.PreviewImagePath;
                 StatusMessage = $"Rendered {frames.Length} frames successfully.";
@@ -500,6 +509,56 @@ namespace code.ViewModels
             // navigates back to the start page.
             _onCancel?.Invoke();
         }
+        
+        [RelayCommand]
+        private async Task ImportWeatherDataAsync()
+        {
+            // 1) Show the map‐picker dialog
+            var dialog = new WeatherLocationPickerDialog
+            {
+                // Owner is set when calling ShowDialog
+            };
+
+            Window? ownerWindow = null;
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            {
+                ownerWindow = desktopLifetime.MainWindow;
+            }
+            
+            var result = await dialog.ShowDialog<(double Lat, double Lon)?>(ownerWindow);
+
+            // 2) Bail out if the user cancelled
+            if (result == null)
+                return;
+
+            var (lat, lon) = result.Value;
+
+            // 3) Fetch from OpenWeatherMap
+            // TODO: Replace "YOUR_API_KEY_HERE" with your actual OpenWeatherMap API key.
+            // It's recommended to store API keys securely, e.g., in a configuration file or environment variable, rather than hardcoding.
+            const string apiKey = "6b5faa7fb32bd53231e7cc77dc92a076"; 
+            var url = $"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={apiKey}&units=metric";
+
+            try
+            {
+                using var client = new HttpClient();
+                var json = await client.GetStringAsync(url);
+                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+
+                // 4) Populate your properties
+                Temperature = (double)data.main.temp;
+                Humidity    = (double)data.main.humidity;
+                Pressure    = (double)data.main.pressure;
+                WindSpeed   = (double)data.wind.speed;
+
+                StatusMessage = $"Imported weather for lat={lat:F4}, lon={lon:F4}";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "Failed to fetch weather: " + ex.Message;
+            }
+        }
+
         
         
         [RelayCommand]

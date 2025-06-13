@@ -36,3 +36,6 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [/home/jaffa/Projects/licenta/licenta/code/code/Views/StartView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[/home/jaffa/Projects/licenta/licenta/code/code/Views/WeatherLocationPickerDialog.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

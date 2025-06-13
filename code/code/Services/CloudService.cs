@@ -9,40 +9,33 @@ using code.Utils;
 
 namespace code.Services
 {
-    public class CloudService : ICloudService
+    public class CloudService(ICloudRepository cloudRepository) : ICloudService
     {
-        private readonly ICloudRepository _cloudRepository;
-
-        public CloudService(ICloudRepository cloudRepository)
-        {
-            _cloudRepository = cloudRepository;
-        }
-
         public Task<IEnumerable<Cloud>> GetAllCloudsAsync()
-            => Task.FromResult(_cloudRepository.GetAll());
+            => Task.FromResult(cloudRepository.GetAll());
 
         public Task<Cloud?> GetCloudByIdAsync(int id)
-            => Task.FromResult(_cloudRepository.GetById(id));
+            => Task.FromResult(cloudRepository.GetById(id));
 
         public Task AddCloudAsync(Cloud cloud)
         {
-            _cloudRepository.Add(cloud);
+            cloudRepository.Add(cloud);
             return Task.CompletedTask;
         }
 
         public Task UpdateCloudAsync(Cloud cloud)
         {
-            _cloudRepository.Update(cloud);
+            cloudRepository.Update(cloud);
             return Task.CompletedTask;
         }
 
         public Task DeleteCloudAsync(int id)
         {
-            _cloudRepository.Delete(id);
+            cloudRepository.Delete(id);
             return Task.CompletedTask;
         }
 
-        private void CleanUpCloudFramesDirectory(Cloud cloudWithStoragePath)
+        private static void CleanUpCloudFramesDirectory(Cloud? cloudWithStoragePath)
         {
             if (cloudWithStoragePath == null || string.IsNullOrEmpty(cloudWithStoragePath.StoragePath))
             {
@@ -58,7 +51,7 @@ namespace code.Services
         }
 
         public async Task<string[]> RenderCloudAnimationAsync(Cloud cloud, int nFrames = 36, int width = 800, int height = 600, bool noLights = false) {
-            Cloud? persistedCloud = await GetCloudByIdAsync(cloud.Id);
+            var persistedCloud = await GetCloudByIdAsync(cloud.Id);
             if (persistedCloud == null || string.IsNullOrEmpty(persistedCloud.StoragePath))
             {
                 throw new InvalidOperationException($"Cloud with ID {cloud.Id} not found in repository or has no storage path.");
@@ -71,7 +64,7 @@ namespace code.Services
             var lights = noLights ? Array.Empty<Light>() : CreateLights();
 
             Func<Light?, Geometry> geometryFactory = light =>
-                SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity, light);
+                SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity,cloud.Temperature,cloud.WindSpeed, light);
 
             var geometries = new List<Geometry>();
             if (noLights)
@@ -174,7 +167,7 @@ namespace code.Services
         public async Task<string> GeneratePreviewAsync(Cloud cloud, int width = 800, int height = 600)
         {
             string previewFilePath;
-            bool isNewCloud = cloud.Id == 0; // Assuming Id is 0 for a new, unsaved cloud from ViewModel
+            bool isNewCloud = cloud.Id == 0;
 
             if (isNewCloud)
             {
@@ -184,7 +177,7 @@ namespace code.Services
                 // projectRootPath should then be <project_folder>/
                 string projectRootPath = Path.GetFullPath(Path.Combine(executionPath, "..", "..", ".."));
                 string tempPreviewDirectory = Path.Combine(projectRootPath, "preview"); // Should resolve to code/preview/
-                
+
                 Directory.CreateDirectory(tempPreviewDirectory); // Ensure the directory exists
                 // Use a unique name for the temporary preview file
                 previewFilePath = Path.Combine(tempPreviewDirectory, $"temp_preview_{DateTime.Now:yyyyMMddHHmmssfff}.png");
@@ -209,8 +202,8 @@ namespace code.Services
 
             // Rendering logic using 'cloud' parameter's properties (Type, Humidity, Altitude etc.)
             var cloudCenter = new Vector3(0, 0, 0); // Use altitude from input 'cloud'
-            var geometry = SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity, light: null); // No light for preview
-            
+            var geometry = SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity,cloud.Temperature,cloud.WindSpeed, light: null); // No light for preview
+
             IRenderer localRenderer;
             if (cloud.RenderEngine == RenderEngineType.GPU)
             {
@@ -224,19 +217,19 @@ namespace code.Services
                 localRenderer = new RayTracer(new Geometry[] { geometry }, Array.Empty<Light>());
                 Console.WriteLine($"[CloudService] RayTracer created for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())}.");
             }
-            
+
             var up = Vector3.UnitY;
             float cameraDist = 60.0f;
             // Fixed camera position for preview, using altitude from the input 'cloud'
-            var camPos = new Vector3(cameraDist, 0, 0); 
+            var camPos = new Vector3(cameraDist, 0, 0);
             var dir = Vector3.Normalize(cloudCenter - camPos);
 
             var camera = new Camera(
                 camPos, dir, up, 65.0f,
-                width * 0.2f, height * 0.2f, // viewplane size adjustment
-                0.1f, 200.0f // near/far planes // Changed FrontPlaneDistance from 0.0f to 0.1f
+                width * 0.2f, height * 0.2f,
+                0.1f, 200.0f
             );
-            
+
             Console.WriteLine($"[CloudService] Attempting to generate preview for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} using {localRenderer.GetType().Name}. Output: {previewFilePath}");
             localRenderer.Render(camera, width, height, previewFilePath);
             Console.WriteLine($"Preview generated for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} at {previewFilePath}");
@@ -246,9 +239,9 @@ namespace code.Services
 
             if (!isNewCloud)
             {
-                await UpdateCloudAsync(cloud); 
+                await UpdateCloudAsync(cloud);
             }
-            
+
             return previewFilePath;
         }
 
@@ -265,3 +258,5 @@ namespace code.Services
             };
     }
 }
+
+
