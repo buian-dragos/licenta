@@ -87,11 +87,15 @@ namespace code.Services
             IRenderer localRenderer;
             if (cloud.RenderEngine == RenderEngineType.GPU)
             {
+                Console.WriteLine($"[CloudService] Creating OpenGLRenderer for cloud {cloud.Id} in RenderCloudAnimationAsync.");
                 localRenderer = new OpenGLRenderer(geometries.ToArray(), lights);
+                Console.WriteLine($"[CloudService] OpenGLRenderer created for cloud {cloud.Id}.");
             }
             else // Default to CPU
             {
+                Console.WriteLine($"[CloudService] Creating RayTracer for cloud {cloud.Id} in RenderCloudAnimationAsync.");
                 localRenderer = new RayTracer(geometries.ToArray(), lights);
+                Console.WriteLine($"[CloudService] RayTracer created for cloud {cloud.Id}.");
             }
 
             var up = Vector3.UnitY;
@@ -107,22 +111,25 @@ namespace code.Services
 
                 tasks.Add(Task.Run(() =>
                 {
+                    Console.WriteLine($"[CloudService] Task.Run started for frame {idx + 1}/{nFrames}, cloud {cloud.Id}. Filename: {filenames[idx]}");
+
                     float angleRad = (float)(angleStep * idx * Math.PI / 180.0);
                     float camX = (float)Math.Cos(angleRad) * cameraDist;
                     float camZ = (float)Math.Sin(angleRad) * cameraDist + cloudCenter.Z;
 
                     // Default camera Y position to cloud altitude as CameraPosition is removed
-                    float camY = (float)cloud.Altitude;
+                    float camY = 0;
 
                     var camPos = new Vector3(camX, camY, camZ);
-                    var dir = Vector3.Normalize(new Vector3(cloudCenter.X, (float)cloud.Altitude, cloudCenter.Z) - camPos);
+                    var dir = Vector3.Normalize(new Vector3(cloudCenter.X, cloudCenter.Y, cloudCenter.Z) - camPos);
 
                     var camera = new Camera(
                         camPos, dir, up, 65.0f,
                         width * 0.2f, height * 0.2f,
-                        0.0f, 200.0f
+                        0.1f, 200.0f // Changed FrontPlaneDistance from 0.0f to 0.1f
                     );
 
+                    Console.WriteLine($"[CloudService] Attempting to render frame {idx + 1} for cloud {cloud.Id} using {localRenderer.GetType().Name}. Output: {filenames[idx]}");
                     localRenderer.Render(camera, width, height, filenames[idx]);
                     Console.WriteLine($"Frame {idx + 1}/{nFrames} for cloud {cloud.Id} completed: {filenames[idx]}");
                 }));
@@ -174,31 +181,36 @@ namespace code.Services
             }
 
             // Rendering logic using 'cloud' parameter's properties (Type, Humidity, Altitude etc.)
-            var cloudCenter = new Vector3(0, 0, (float)cloud.Altitude); // Use altitude from input 'cloud'
+            var cloudCenter = new Vector3(0, 0, 0); // Use altitude from input 'cloud'
             var geometry = SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity, light: null); // No light for preview
             
             IRenderer localRenderer;
             if (cloud.RenderEngine == RenderEngineType.GPU)
             {
+                Console.WriteLine($"[CloudService] Creating OpenGLRenderer for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} in GeneratePreviewAsync.");
                 localRenderer = new OpenGLRenderer(new Geometry[] { geometry }, Array.Empty<Light>());
+                Console.WriteLine($"[CloudService] OpenGLRenderer created for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())}.");
             }
             else // Default to CPU
             {
+                Console.WriteLine($"[CloudService] Creating RayTracer for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} in GeneratePreviewAsync.");
                 localRenderer = new RayTracer(new Geometry[] { geometry }, Array.Empty<Light>());
+                Console.WriteLine($"[CloudService] RayTracer created for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())}.");
             }
             
             var up = Vector3.UnitY;
             float cameraDist = 60.0f;
             // Fixed camera position for preview, using altitude from the input 'cloud'
-            var camPos = new Vector3(cameraDist, (float)cloud.Altitude, (float)cloud.Altitude); 
+            var camPos = new Vector3(cameraDist, 0, 0); 
             var dir = Vector3.Normalize(cloudCenter - camPos);
 
             var camera = new Camera(
                 camPos, dir, up, 65.0f,
                 width * 0.2f, height * 0.2f, // viewplane size adjustment
-                0.0f, 200.0f // near/far planes
+                0.1f, 200.0f // near/far planes // Changed FrontPlaneDistance from 0.0f to 0.1f
             );
             
+            Console.WriteLine($"[CloudService] Attempting to generate preview for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} using {localRenderer.GetType().Name}. Output: {previewFilePath}");
             localRenderer.Render(camera, width, height, previewFilePath);
             Console.WriteLine($"Preview generated for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} at {previewFilePath}");
 
@@ -207,9 +219,6 @@ namespace code.Services
 
             if (!isNewCloud)
             {
-                // Only persist the PreviewImagePath update to storage if it's an existing cloud.
-                // The 'cloud' object here should have all properties of the persisted cloud if it came from GetById.
-                // If 'cloud' is a DTO from UI, ensure it has the correct Id for UpdateCloudAsync.
                 await UpdateCloudAsync(cloud); 
             }
             

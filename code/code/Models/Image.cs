@@ -3,32 +3,15 @@ using SkiaSharp;
 
 public class Image
 {
-    private SKBitmap bitmap;
-    private SKCanvas canvas;
-    private SKPaint paint;
-
-    public Image(int width, int height)
+    private SKBitmap _bmp;
+    public Image(int w, int h) => _bmp = new SKBitmap(w, h, SKColorType.Rgba8888, SKAlphaType.Premul);
+    public void SetPixel(int x, int y, SKColor c) => _bmp.SetPixel(x, y, c);
+    public void Store(string path)
     {
-        bitmap = new SKBitmap(width, height);
-        canvas = new SKCanvas(bitmap);
-        paint = new SKPaint();
-    }
-
-    public void SetPixel(int x, int y, SKColor color)
-    {
-        paint.Color = color;
-        canvas.DrawPoint(x, y, paint);
-    }
-
-    public void Store(string filename)
-    {
-        using (var image = SKImage.FromBitmap(bitmap))
-        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
-        {
-            using (var stream = File.OpenWrite(filename))
-            {
-                data.SaveTo(stream);
-            }
-        }
+        using var img  = SKImage.FromBitmap(_bmp);
+        using var data = img.Encode(SKEncodedImageFormat.Png, 100);
+        using var fs   = File.OpenWrite(path);
+        data.SaveTo(fs);
     }
 }
+

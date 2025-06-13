@@ -1,0 +1,15 @@
+{
+  "Id": 3,
+  "Name": "Cloud_20250613_025844",
+  "Type": 1,
+  "Altitude": 0,
+  "Temperature": 0,
+  "Pressure": 0,
+  "WindSpeed": 0,
+  "Humidity": 50,
+  "RenderingPreset": 1,
+  "RenderEngine": 1,
+  "CreatedAt": "2025-06-13T02:58:35.3923878",
+  "PreviewImagePath": "/home/jaffa/Projects/licenta/licenta/code/code/Clouds/cloud-20250613025835392/frames/cloud_frame_001.png",
+  "StoragePath": "/home/jaffa/Projects/licenta/licenta/code/code/Clouds/cloud-20250613025835392"
+}

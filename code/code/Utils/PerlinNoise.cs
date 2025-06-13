@@ -15,9 +15,7 @@ public class PerlinNoise
         for (int i = 0; i < 256; i++)
         {
             int j = rand.Next(256);
-            int tmp = p[i];
-            p[i] = p[j];
-            p[j] = tmp;
+            (p[i], p[j]) = (p[j], p[i]);
         }
         for (int i = 0; i < 512; i++) perm[i] = p[i & 255];
     }

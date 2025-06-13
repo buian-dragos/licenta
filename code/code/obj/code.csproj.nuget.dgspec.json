@@ -66,6 +66,10 @@
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.2.1, )"
+            },
+            "OpenTK": {
+              "target": "Package",
+              "version": "[4.9.4, )"
             }
           },
           "imports": [

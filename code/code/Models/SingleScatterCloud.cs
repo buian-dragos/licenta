@@ -16,6 +16,14 @@ namespace code.Models
         private readonly PerlinNoise _noise = new PerlinNoise(42);   // Deterministic noise
         
 
+        // ——— GPU accessors ———
+        public Vector3 Center      => _center;
+        public Vector3 Axes        => _axes;
+        public float   BaseDensity => _baseDensity;
+        public Color   CloudColor  => _cloudColor;
+        public float   Step        => _step;
+
+        
         public SingleScatterCloud(Vector3 center,
                                   Vector3 axes,
                                   float   baseDensity,

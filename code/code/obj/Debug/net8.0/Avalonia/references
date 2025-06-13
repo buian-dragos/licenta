@@ -32,6 +32,15 @@
 /home/jaffa/.dotnet/packs/Microsoft.NETCore.App.Ref/8.0.13/ref/net8.0/Microsoft.Win32.Registry.dll
 /home/jaffa/.dotnet/packs/Microsoft.NETCore.App.Ref/8.0.13/ref/net8.0/mscorlib.dll
 /home/jaffa/.dotnet/packs/Microsoft.NETCore.App.Ref/8.0.13/ref/net8.0/netstandard.dll
+/home/jaffa/.nuget/packages/opentk.audio.openal/4.9.4/lib/netcoreapp3.1/OpenTK.Audio.OpenAL.dll
+/home/jaffa/.nuget/packages/opentk.compute/4.9.4/lib/netcoreapp3.1/OpenTK.Compute.dll
+/home/jaffa/.nuget/packages/opentk.core/4.9.4/lib/netstandard2.1/OpenTK.Core.dll
+/home/jaffa/.nuget/packages/opentk.graphics/4.9.4/lib/netcoreapp3.1/OpenTK.Graphics.dll
+/home/jaffa/.nuget/packages/opentk.input/4.9.4/lib/netstandard2.0/OpenTK.Input.dll
+/home/jaffa/.nuget/packages/opentk.mathematics/4.9.4/lib/netcoreapp3.1/OpenTK.Mathematics.dll
+/home/jaffa/.nuget/packages/opentk.windowing.common/4.9.4/lib/netcoreapp3.1/OpenTK.Windowing.Common.dll
+/home/jaffa/.nuget/packages/opentk.windowing.desktop/4.9.4/lib/netcoreapp3.1/OpenTK.Windowing.Desktop.dll
+/home/jaffa/.nuget/packages/opentk.windowing.graphicslibraryframework/4.9.4/lib/netcoreapp3.1/OpenTK.Windowing.GraphicsLibraryFramework.dll
 /home/jaffa/.nuget/packages/skiasharp/2.88.9/lib/net6.0/SkiaSharp.dll
 /home/jaffa/.dotnet/packs/Microsoft.NETCore.App.Ref/8.0.13/ref/net8.0/System.AppContext.dll
 /home/jaffa/.dotnet/packs/Microsoft.NETCore.App.Ref/8.0.13/ref/net8.0/System.Buffers.dll
