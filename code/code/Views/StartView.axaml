@@ -22,7 +22,7 @@
                 HorizontalAlignment="Center"
                 TextAlignment="Center"/>
 
-            <!-- \u201cRender New Cloud\u201d button -->
+            <!-- “Render New Cloud” button -->
             <Button
                 Content="Render New Cloud"
                 Command="{Binding NavigateToCreateCloudCommand}"
@@ -36,9 +36,10 @@
                 CornerRadius="8"
                 HorizontalAlignment="Center"/>
 
-            <!-- \u201cOpen cloud library\u201d button (no command yet) -->
+            <!-- “Open cloud library” button -->
             <Button
                 Content="Open cloud library"
+                Command="{Binding NavigateToCloudLibraryCommand}"
                 FontSize="20"
                 FontWeight="SemiBold"
                 Foreground="White"

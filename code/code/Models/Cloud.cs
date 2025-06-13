@@ -25,13 +25,6 @@ namespace code.Models
         Quality
     }
 
-    public enum CameraPosition
-    {
-        GroundLevel,
-        CloudLevel,
-        AboveClouds
-    }
-
     public enum RenderEngineType // New Enum
     {
         CPU,
@@ -58,7 +51,6 @@ namespace code.Models
 
         public RenderingPreset RenderingPreset { get; set; }
         
-        // public CameraPosition CameraPosition { get; set; } // This was removed as per user's previous request implicitly by removing UI for it
         public RenderEngineType RenderEngine { get; set; } // New Property
 
         public DateTime CreatedAt { get; set; }
