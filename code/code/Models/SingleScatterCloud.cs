@@ -55,27 +55,27 @@ namespace code.Models
             float     step  = 0.4f
         )
         {
-            // 1) Base WMO parameters
+            // Base WMO parameters from cloud type
             var (axes, baseDensity, tint) = CloudFactory.GetCloudParameters(type);
 
-            // 2) Temperature → ice clouds if below 0°C
+            // Temperature - water/ice content
             if (temperature < 0)
             {
-                baseDensity *= 0.6f;  // optically thinner
+                baseDensity *= 0.6f; 
                 tint = new Color(
                     tint.Red   * 0.85f,
                     tint.Green * 0.90f,
-                    tint.Blue  * 1.10f,  // slight blue shift
+                    tint.Blue  * 1.10f, 
                     tint.Alpha * 0.6f
                 );
             }
 
-            // 3) Wind → stretch X/Z
+            // Wind - stretch the cloud
             float stretch = 1f + 0.02f * (float)windSpeed;  // 2% per m/s
             axes.X *= stretch;
             axes.Z *= stretch;
 
-            // 4) Humidity → final density & alpha
+            // Humidity - final density & alpha
             float hScale = (float)(humidityPercent / 100.0);
             float finalDensity = baseDensity * hScale;
             var finalColor = new Color(
@@ -115,12 +115,12 @@ namespace code.Models
 
         private float DensityAt(Vector3 p)
         {
-            // Transform into ellipsoid‐normalized coords
+            // Start from an ellipsoid
             Vector3 lp = (p - _center) / _axes;
             float   r  = lp.Length();
     
-            // If we’re way outside even the noisy margin, bail early
-            const float outMargin = 0.75f;             // 15% of your axes
+
+            const float outMargin = 0.75f;
             if (r > 1f + outMargin) return 0f;
     
             // Generate layered noise
@@ -128,13 +128,12 @@ namespace code.Models
             float nMed   = _noise.Noise(p.X * 0.15f, p.Y * 0.15f, p.Z * 0.15f);
             float nSmall = _noise.Noise(p.X * 0.30f, p.Y * 0.30f, p.Z * 0.30f);
     
-            // Compute your noisy boundary (in normalized ellipsoid-space)
+            // Compute your noisy boundary
             float boundary = 1f
                              + 0.3f  * _noise.Noise(lp.X * 2f, lp.Y * 2f, lp.Z * 2f)
                              + 0.15f * _noise.Noise(lp.X * 4f, lp.Y * 4f, lp.Z * 4f);
     
-            // **New**: compute a sharp envelope that collapses density to zero
-            // at 'boundary' and above, but fades over 'outMargin'.
+ 
             float envelope = (boundary - r) / outMargin;
             // clamp to [0,1]
             if (envelope <= 0f) return 0f;
@@ -144,7 +143,7 @@ namespace code.Models
             float n = 0.6f + 0.35f*nLarge + 0.25f*nMed + 0.15f*nSmall;
             n = MathF.Max(0f, n);
     
-            // Inner fade + height fall-off unchanged
+            // Inner fade + height fall-off
             float fade   = MathF.Pow(1f - r/boundary, 1.5f);
             float height = MathF.Max(0f, 1f - MathF.Pow(MathF.Max(0f, lp.Y + 0.3f), 2f));
             const float minBase = 0.03f;
@@ -152,8 +151,7 @@ namespace code.Models
             float rawDensity = _baseDensity
                                * height
                                * (n * fade + minBase * (1f - fade));
-    
-            // Apply the new envelope
+            
             return rawDensity * envelope;
         }
 
@@ -165,11 +163,11 @@ namespace code.Models
             float dist = toL.Length();
             Vector3 dir = Vector3.Normalize(toL);
 
-            float t = 0f, tau = 0f, dt = _step*2f; // faster march for shadow
+            float t = 0f, tau = 0f, dt = _step*2f;
             while (t < dist)
             {
                 tau += DensityAt(pos + dir*t) * dt;
-                if (tau > 10f) return 0f; // opaque
+                if (tau > 10f) return 0f;
                 t += dt;
             }
             return MathF.Exp(-tau);

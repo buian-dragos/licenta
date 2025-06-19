@@ -24,10 +24,10 @@ namespace code.Views
         {
             InitializeComponent();
 
-            var (lon, lat) = (24.875, 45.8); // Adjusted latitude slightly for better centering on Romania
+            var (lon, lat) = (24.875, 45.8); 
             var (centerX, centerY) = SphericalMercator.FromLonLat(lon, lat);
             var initialCenter = new MPoint(centerX, centerY);
-            var initialResolution = 7500.0; // 7500 m/pixel for a country-level view
+            var initialResolution = 7500.0; 
 
             var map = new Map(); 
             
@@ -37,10 +37,8 @@ namespace code.Views
             MapControl.Map = map;
             
 
-            // Changed NavigateTo to Navigate, using named arguments for clarity
             map.Navigator.FlyTo(center: initialCenter, maxResolution: initialResolution);
             
-            // Changed NavigateTo to Navigate for the Home action as well
             map.Home = navigator => navigator.FlyTo(center: initialCenter, maxResolution: initialResolution);
             
             MapControl.Refresh();

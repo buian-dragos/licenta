@@ -11,7 +11,6 @@
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="16">
 
-        <!-- Top bar -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
             <Button Grid.Column="0"
                     Content="Back"
@@ -32,9 +31,7 @@
                        Margin="0,16,0,0"/>
         </Grid>
 
-        <!-- Main Content -->
         <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-            <!-- Image Container with Zoom Buttons -->
             <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border Width="480"
                         Height="480"
@@ -49,7 +46,6 @@
                     </Image>
                 </Border>
 
-                <!-- Zoom Buttons -->
                 <StackPanel Orientation="Horizontal" Spacing="8"
                             HorizontalAlignment="Right" VerticalAlignment="Bottom"
                             Margin="0,0,10,10">
@@ -68,7 +64,6 @@
                 </StackPanel>
             </Panel>
 
-            <!-- Details, anchored to the right -->
             <StackPanel VerticalAlignment="Center" 
                         HorizontalAlignment="Right"
                         Margin="0,0,32,0" 
@@ -104,7 +99,6 @@
             </StackPanel>
         </Grid>
 
-        <!-- Slider at bottom, occupying 75% of available width and centered -->
         <Grid Grid.Row="2" Margin="0,20,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.125*"/>

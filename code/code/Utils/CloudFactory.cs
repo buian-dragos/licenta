@@ -7,28 +7,27 @@ namespace code.Utils
     {
         public static (Vector3 Axes, float BaseDensity, Color Tint) GetCloudParameters(CloudType type)
         {
-            Vector3 axes;      // width, height, depth  (m)
-            float   baseDens;  // scattering coeff σ_s (0-1 scaled)
-            Color   tint;      // RGB + single-scatter albedo in A
+            Vector3 axes;
+            float   baseDens;  
+            Color   tint;      
 
             switch (type)
             {
-                /*────────────── Convective / vertical development ─────────────*/
-                case CloudType.Cumulus:               // fair-weather puff
+                
+                case CloudType.Cumulus:               
                     axes     = new Vector3(35, 15, 25);
                     baseDens = 0.12f;
                     tint     = new Color(1.0f, 1.0f, 1.0f, 0.75f);
                     break;
 
-                case CloudType.Cumulonimbus:          // moderate tower, not full anvil
-                    axes     = new Vector3(45, 35, 35);  // keep reference width but add height
+                case CloudType.Cumulonimbus:          
+                    axes     = new Vector3(45, 35, 35);
                     baseDens = 0.18f;
                     tint     = new Color(0.52f, 0.52f, 0.57f, 0.85f);
                     break;
 
-                /*────────────── Low clouds (sheet-like) ───────────────────────*/
                 case CloudType.Stratus:
-                    axes     = new Vector3(55, 10, 40);  // thicker than before but modest
+                    axes     = new Vector3(55, 10, 40); 
                     baseDens = 0.11f;
                     tint     = new Color(0.93f, 0.94f, 0.98f, 0.75f);
                     break;
@@ -44,8 +43,7 @@ namespace code.Utils
                     baseDens = 0.20f;
                     tint     = new Color(0.85f, 0.87f, 0.92f, 0.9f);
                     break;
-
-                /*────────────── Mid-level ─────────────────────────────────────*/
+                
                 case CloudType.Altostratus:
                     axes     = new Vector3(60, 12, 45);
                     baseDens = 0.10f;
@@ -57,8 +55,7 @@ namespace code.Utils
                     baseDens = 0.09f;
                     tint     = new Color(1.0f, 1.0f, 1.0f, 0.7f);
                     break;
-
-                /*────────────── High clouds ───────────────────────────────────*/
+                
                 case CloudType.Cirrus:
                     axes     = new Vector3(60, 6, 45);
                     baseDens = 0.04f;
@@ -77,7 +74,6 @@ namespace code.Utils
                     tint     = new Color(0.95f, 0.99f, 1.0f, 0.45f);
                     break;
 
-                /*────────────── Fallback ─────────────────────────────────────*/
                 default:
                     axes     = new Vector3(45, 18, 35);
                     baseDens = 0.12f;

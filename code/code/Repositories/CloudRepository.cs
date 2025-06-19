@@ -17,12 +17,10 @@ namespace code.Repositories
         public CloudRepository()
         {
             string executionPath = AppContext.BaseDirectory;
-            // Assuming the executable is in a path like /<project_root>/code/bin/Debug/netX.Y/
-            // We want _cloudsBaseDirectory to be /<project_root>/code/Clouds/
             string projectRootPath = Path.GetFullPath(Path.Combine(executionPath, "..", "..", "..")); 
             _cloudsBaseDirectory = Path.Combine(projectRootPath, "Clouds");
 
-            Directory.CreateDirectory(_cloudsBaseDirectory); // Ensure base directory exists
+            Directory.CreateDirectory(_cloudsBaseDirectory);
             LoadAllCloudsFromDisk();
         }
 
@@ -32,7 +30,7 @@ namespace code.Repositories
             int maxId = 0;
             if (Directory.Exists(_cloudsBaseDirectory))
             {
-                // Match folder names like "cloud-YYYYMMDDHHMMSSFFF"
+                // folder names like "cloud-YYYYMMDDHHMMSSFFF"
                 foreach (var dirPath in Directory.GetDirectories(_cloudsBaseDirectory, "cloud-*"))
                 {
                     string propertiesFilePath = Path.Combine(dirPath, "properties.json");
@@ -44,7 +42,7 @@ namespace code.Repositories
                             Cloud? cloud = JsonSerializer.Deserialize<Cloud>(jsonString);
                             if (cloud != null)
                             {
-                                cloud.StoragePath = dirPath; // Ensure StoragePath is correctly set upon loading
+                                cloud.StoragePath = dirPath;
                                 _clouds.Add(cloud);
                                 if (cloud.Id > maxId) maxId = cloud.Id;
                             }
@@ -72,9 +70,7 @@ namespace code.Repositories
 
         public IEnumerable<Cloud> GetAll()
         {
-            // To ensure data is fresh, could reload from disk here or rely on initial load.
-            // LoadAllCloudsFromDisk(); // Uncomment if fresh data is needed on every call
-            return _clouds.ToList(); // Return a copy of the in-memory list
+            return _clouds.ToList();
         }
 
         public Cloud? GetById(int id)
@@ -85,25 +81,18 @@ namespace code.Repositories
         public void Add(Cloud cloud)
         {
             cloud.Id = _nextId++;
-            // Folder name format: cloud-{timeCreatedAt} as per user request
             string folderName = $"cloud-{cloud.CreatedAt:yyyyMMddHHmmssfff}"; 
             cloud.StoragePath = Path.Combine(_cloudsBaseDirectory, folderName);
 
             if (Directory.Exists(cloud.StoragePath))
             {
-                // This case implies a non-unique CreatedAt timestamp to the millisecond, or a retry.
-                // A robust solution might append cloud.Id or a unique suffix.
-                // For now, log and proceed; new files might overwrite or merge depending on OS.
                 Console.WriteLine($"Warning: Cloud storage directory {cloud.StoragePath} already exists. Potential for conflict.");
-                // To ensure uniqueness, one might use:
-                // folderName = $"cloud-{cloud.CreatedAt:yyyyMMddHHmmssfff}-{cloud.Id}";
-                // cloud.StoragePath = Path.Combine(_cloudsBaseDirectory, folderName);
             }
 
             Directory.CreateDirectory(cloud.StoragePath);
-            Directory.CreateDirectory(Path.Combine(cloud.StoragePath, "frames")); // Create frames subdirectory
+            Directory.CreateDirectory(Path.Combine(cloud.StoragePath, "frames"));
 
-            SaveCloudProperties(cloud); // Save properties to JSON file
+            SaveCloudProperties(cloud);
             _clouds.Add(cloud);
         }
 
@@ -112,10 +101,6 @@ namespace code.Repositories
             var existingCloud = _clouds.FirstOrDefault(c => c.Id == cloud.Id);
             if (existingCloud != null)
             {
-                // Update properties of the existingCloud object from the passed cloud object
-                // This preserves the existingCloud instance in the list if other parts of the app hold references to it.
-                // However, typical MVVM might replace the object or expect the passed 'cloud' to be the new reference.
-                // For simplicity, let's update the fields of the existing object.
                 existingCloud.Name = cloud.Name;
                 existingCloud.Type = cloud.Type;
                 existingCloud.Altitude = cloud.Altitude;
@@ -125,14 +110,12 @@ namespace code.Repositories
                 existingCloud.Humidity = cloud.Humidity;
                 existingCloud.RenderingPreset = cloud.RenderingPreset;
                 existingCloud.RenderEngine = cloud.RenderEngine;
-                existingCloud.CreatedAt = cloud.CreatedAt; // Should this be updatable? Usually not.
+                existingCloud.CreatedAt = cloud.CreatedAt;
                 existingCloud.PreviewImagePath = cloud.PreviewImagePath;
-                // StoragePath should not change after creation.
-                // existingCloud.StoragePath = cloud.StoragePath; // This should be set on Add and not change.
 
                 if (!string.IsNullOrEmpty(existingCloud.StoragePath))
                 {
-                    SaveCloudProperties(existingCloud); // Save updated properties to JSON
+                    SaveCloudProperties(existingCloud);
                 }
                 else
                 {
@@ -141,21 +124,20 @@ namespace code.Repositories
             }
             else
             {
-                // Cloud not found in memory, perhaps it should be an error or an Add?
                 Console.WriteLine($"Warning: Attempted to update cloud with ID {cloud.Id} but it was not found in the repository.");
             }
         }
 
         public void Delete(int id)
         {
-            var cloud = GetById(id); // Find cloud in the in-memory list
+            var cloud = GetById(id);
             if (cloud != null)
             {
                 if (!string.IsNullOrEmpty(cloud.StoragePath) && Directory.Exists(cloud.StoragePath))
                 {
-                    Directory.Delete(cloud.StoragePath, recursive: true); // Delete the cloud's folder from disk
+                    Directory.Delete(cloud.StoragePath, recursive: true);
                 }
-                _clouds.Remove(cloud); // Remove from the in-memory list
+                _clouds.Remove(cloud);
             }
         }
     }

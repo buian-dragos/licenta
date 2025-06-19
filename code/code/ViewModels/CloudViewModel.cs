@@ -61,7 +61,6 @@ namespace code.ViewModels
             RenderCloudAnimationCommand = new AsyncRelayCommand<Cloud>(RenderCloudAsync, CanRenderCloud);
             CreateNewCloudCommand = new RelayCommand(CreateNewCloud);
 
-            // Initial load
             _ = LoadCloudsAsync();
         }
 

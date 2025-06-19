@@ -97,7 +97,6 @@ namespace code.Services
 
             if (cloud.RenderEngine == RenderEngineType.GPU)
             {
-                // ───── SERIAL RENDERING FOR GPU ─────
                 for (int i = 0; i < nFrames; i++)
                 {
                     filenames[i] = Path.Combine(cloudFramesPath, $"cloud_frame_{i + 1:000}.png");
@@ -123,7 +122,7 @@ namespace code.Services
             }
             else
             {
-                // ───── PARALLEL RENDERING FOR CPU ─────
+                // Parallel rendering for CPU-based renderer
                 var tasks = new List<Task>();
                 for (int i = 0; i < nFrames; i++)
                 {
@@ -171,20 +170,16 @@ namespace code.Services
 
             if (isNewCloud)
             {
-                // For a new, unsaved cloud, generate preview in a temporary global location.
                 string executionPath = AppContext.BaseDirectory;
-                // executionPath is typically <project_folder>/bin/Debug/netX.Y/
-                // projectRootPath should then be <project_folder>/
-                string projectRootPath = Path.GetFullPath(Path.Combine(executionPath, "..", "..", ".."));
-                string tempPreviewDirectory = Path.Combine(projectRootPath, "preview"); // Should resolve to code/preview/
 
-                Directory.CreateDirectory(tempPreviewDirectory); // Ensure the directory exists
-                // Use a unique name for the temporary preview file
+                string projectRootPath = Path.GetFullPath(Path.Combine(executionPath, "..", "..", ".."));
+                string tempPreviewDirectory = Path.Combine(projectRootPath, "preview");
+
+                Directory.CreateDirectory(tempPreviewDirectory);
                 previewFilePath = Path.Combine(tempPreviewDirectory, $"temp_preview_{DateTime.Now:yyyyMMddHHmmssfff}.png");
             }
             else
             {
-                // For an existing cloud, use its dedicated storage path.
                 Cloud? persistedCloud = await GetCloudByIdAsync(cloud.Id);
                 if (persistedCloud == null || string.IsNullOrEmpty(persistedCloud.StoragePath))
                 {
@@ -192,16 +187,13 @@ namespace code.Services
                 }
                 previewFilePath = Path.Combine(persistedCloud.StoragePath, "preview.png");
             }
-
-            // If a file already exists at the path, delete it before rendering the new one.
-            // This is especially important for the non-temporary preview.png.
+            
             if (File.Exists(previewFilePath))
             {
                 File.Delete(previewFilePath);
             }
 
-            // Rendering logic using 'cloud' parameter's properties (Type, Humidity, Altitude etc.)
-            var cloudCenter = new Vector3(0, 0, 0); // Use altitude from input 'cloud'
+            var cloudCenter = new Vector3(0, 0, 0);
             var geometry = SingleScatterCloud.FromType(cloud.Type, cloudCenter, cloud.Humidity,cloud.Temperature,cloud.WindSpeed, light: null); // No light for preview
 
             IRenderer localRenderer;
@@ -220,7 +212,6 @@ namespace code.Services
 
             var up = Vector3.UnitY;
             float cameraDist = 60.0f;
-            // Fixed camera position for preview, using altitude from the input 'cloud'
             var camPos = new Vector3(cameraDist, 0, 0);
             var dir = Vector3.Normalize(cloudCenter - camPos);
 
@@ -234,7 +225,6 @@ namespace code.Services
             localRenderer.Render(camera, width, height, previewFilePath);
             Console.WriteLine($"Preview generated for cloud {(isNewCloud ? "NEW (temp)" : cloud.Id.ToString())} at {previewFilePath}");
 
-            // Update the PreviewImagePath on the cloud object passed in (which might be a ViewModel's DTO)
             cloud.PreviewImagePath = previewFilePath;
 
             if (!isNewCloud)

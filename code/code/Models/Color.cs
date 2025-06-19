@@ -35,8 +35,6 @@ namespace code.Models
             Blue = c.Blue;
             Alpha = c.Alpha;
         }
-
-        // Convert to SkiaSharp's SKColor
         
         private static float Clamp01(float v) => v < 0f ? 0f : (v > 1f ? 1f : v);
         private static byte ToSrgb8(float linear)
@@ -47,6 +45,9 @@ namespace code.Models
             return (byte)MathF.Round(srgb * 255f);
         }
         
+        
+        // Convert to SkiaSharp's SKColor
+
         public SKColor ToSKColor()
             => new SKColor(ToSrgb8(Red), ToSrgb8(Green), ToSrgb8(Blue), ToSrgb8(Alpha));
         public static Color operator +(Color a, Color b)

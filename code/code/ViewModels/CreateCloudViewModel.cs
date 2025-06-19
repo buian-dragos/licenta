@@ -21,7 +21,6 @@ namespace code.ViewModels
         private readonly Action? _onCreated;
         private readonly Action? _onCancel;
 
-        // Computed flags for UI
         public bool IsPreviewVisible => !IsPreviewLoading;
         public bool CanGeneratePreview => !IsPreviewLoading;
 
@@ -31,7 +30,6 @@ namespace code.ViewModels
             OnPropertyChanged(nameof(CanGeneratePreview));
         }
 
-        // ─── Bound Properties ────────────────────────────────────────────
 
         [ObservableProperty]
         private DateTimeOffset _createdDate = DateTimeOffset.Now;
@@ -331,7 +329,6 @@ namespace code.ViewModels
         public string[] RenderingPresetLabels { get; } = new[] { "Fast", "Quality" };
         public string[] RenderEngineLabels { get; } = new[] { "CPU", "GPU" };
 
-        // ─── Constructor ──────────────────────────────────────────────────
         public CreateCloudViewModel(
             CloudService cloudService,
             Action? onCreated = null,
@@ -394,9 +391,7 @@ namespace code.ViewModels
             IsCpuRenderEngineSelected = RenderEngineIndex == 0;
             IsGpuRenderEngineSelected = RenderEngineIndex == 1;
         }
-
-        // ─── Commands to set toggle‐button indices ─────────────────────────
-
+        
         [RelayCommand]
         private void SetCloudTypeIndex(int index)
         {
@@ -418,7 +413,6 @@ namespace code.ViewModels
             UpdateToggleButtonStatesFromIndices();
         }
 
-        // ─── GeneratePreviewCommand ───────────────────────────────────────
         [RelayCommand]
         private async Task GeneratePreviewAsync()
         {
@@ -458,7 +452,6 @@ namespace code.ViewModels
             }
         }
 
-        // ─── RenderCloudCommand ───────────────────────────────────────────
         [RelayCommand]
         private async Task RenderCloudAsync()
         {
@@ -501,22 +494,17 @@ namespace code.ViewModels
             }
         }
 
-        // ─── CancelCommand ───────────────────────────────────────────────
         [RelayCommand]
         private void NavigateToStartPage()
         {
-            // Simply invokes the cancel callback, which in your MainWindowViewModel
-            // navigates back to the start page.
             _onCancel?.Invoke();
         }
         
         [RelayCommand]
         private async Task ImportWeatherDataAsync()
         {
-            // 1) Show the map‐picker dialog
             var dialog = new WeatherLocationPickerDialog
             {
-                // Owner is set when calling ShowDialog
             };
 
             Window? ownerWindow = null;
@@ -527,15 +515,10 @@ namespace code.ViewModels
             
             var result = await dialog.ShowDialog<(double Lat, double Lon)?>(ownerWindow);
 
-            // 2) Bail out if the user cancelled
             if (result == null)
                 return;
 
             var (lat, lon) = result.Value;
-
-            // 3) Fetch from OpenWeatherMap
-            // TODO: Replace "YOUR_API_KEY_HERE" with your actual OpenWeatherMap API key.
-            // It's recommended to store API keys securely, e.g., in a configuration file or environment variable, rather than hardcoding.
             const string apiKey = "6b5faa7fb32bd53231e7cc77dc92a076"; 
             var url = $"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={apiKey}&units=metric";
 
@@ -545,7 +528,6 @@ namespace code.ViewModels
                 var json = await client.GetStringAsync(url);
                 dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
 
-                // 4) Populate your properties
                 Temperature = (double)data.main.temp;
                 Humidity    = (double)data.main.humidity;
                 Pressure    = (double)data.main.pressure;
@@ -585,6 +567,5 @@ namespace code.ViewModels
 
     public class CloudRenderDto : CloudPreviewDto
     {
-        // You can add extra fields here if needed
     }
 }

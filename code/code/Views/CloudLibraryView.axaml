@@ -9,7 +9,6 @@
              x:DataType="vm:CloudLibraryViewModel">
 
   <Design.DataContext>
-    <!-- ViewModel now handles its own design-time data via parameterless constructor -->
     <vm:CloudLibraryViewModel />
   </Design.DataContext>
 

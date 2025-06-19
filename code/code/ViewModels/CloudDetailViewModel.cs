@@ -60,14 +60,13 @@ namespace code.ViewModels
         [ObservableProperty]
         private int _currentFrameIndex = 0;
 
-        [ObservableProperty] // Added for slider visibility
+        [ObservableProperty]
         private bool _isFrameSliderVisible = false;
 
         private const double ZoomStep = 0.1;
         private const double MinZoom = 0.5;
         private const double MaxZoom = 3.0;
 
-        // Design-time constructor
         public CloudDetailViewModel()
         {
             if (!Avalonia.Controls.Design.IsDesignMode)
@@ -75,10 +74,8 @@ namespace code.ViewModels
                 throw new InvalidOperationException("This constructor is intended for design-time use only.");
             }
 
-            // Initialize properties with default/sample values for XAML preview
-            // No dummy Cloud object is created here.
             CloudName = "Sample Cloud (Design)";
-            CloudType = Models.CloudType.Cumulus.ToString(); // Using actual enum for consistency
+            CloudType = Models.CloudType.Cumulus.ToString(); 
             Altitude = 2.5;
             Temperature = 15.0;
             Pressure = 1012.0;
@@ -87,14 +84,10 @@ namespace code.ViewModels
             RenderingPreset = Models.RenderingPreset.Quality.ToString();
             RenderEngine = Models.RenderEngineType.CPU.ToString();
             CreatedAt = DateTime.Now.ToString("g");
-            PreviewImage = null; // No preview image at design time by default
-            // Design-time values for slider
-            MaxFrameIndex = 0; // Or a sample value like 99 if you want to see the slider enabled
+            PreviewImage = null;
+            MaxFrameIndex = 0;
             CurrentFrameIndex = 0;
-            IsFrameSliderVisible = false; // Or true if MaxFrameIndex > 0 for design
-            
-            // _cloud, _cloudService, and _onNavigateBack remain uninitialized (null) in design mode,
-            // as they are not typically used by the XAML previewer for basic property display.
+            IsFrameSliderVisible = false;
         }
 
         public CloudDetailViewModel(Cloud cloud, ICloudService cloudService, Action onNavigateBack)
@@ -133,27 +126,26 @@ namespace code.ViewModels
             string framesDirectory = Path.Combine(_cloud.StoragePath, "frames");
             if (Directory.Exists(framesDirectory))
             {
-                _framePaths = Directory.GetFiles(framesDirectory, "*.png") // Assuming PNG frames
-                                     .OrderBy(f => f) // Ensure natural sort order
+                _framePaths = Directory.GetFiles(framesDirectory, "*.png")
+                                     .OrderBy(f => f) 
                                      .ToList();
 
                 if (_framePaths.Any())
                 {
                     MaxFrameIndex = _framePaths.Count - 1;
-                    IsFrameSliderVisible = _framePaths.Count > 1; // Set visibility
-                    LoadFrameAtIndex(CurrentFrameIndex); // Load the first frame
+                    IsFrameSliderVisible = _framePaths.Count > 1;
+                    LoadFrameAtIndex(CurrentFrameIndex); 
                 }
                 else
                 {
-                    PreviewImage = null; // No frames found
+                    PreviewImage = null;
                     IsFrameSliderVisible = false;
                 }
             }
             else
             {
-                // If frames directory doesn't exist, try loading the single PreviewImagePath as fallback
                 LoadSinglePreviewImage(); 
-                IsFrameSliderVisible = false; // No frames to slide through
+                IsFrameSliderVisible = false;
             }
         }
 
@@ -199,7 +191,7 @@ namespace code.ViewModels
             }
             else
             {
-                PreviewImage = null; // Index out of bounds
+                PreviewImage = null;
             }
         }
 

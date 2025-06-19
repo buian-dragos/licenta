@@ -23,7 +23,7 @@ namespace code.Utils
         };
         private static readonly uint[] QuadIdxs = { 0, 1, 2, 2, 3, 0 };
 
-        // Vertex shader: 2D quad -> UV
+        // Vertex shader: 2D quad to UV
         private const string VertexSrc = @"#version 330 core
 layout(location = 0) in vec2 aPos;
 out vec2 vUV;
@@ -230,7 +230,6 @@ void main()
             _lights = lights;
         }
 
-        // Compile shader source
         private static int CompileShader(string src, ShaderType type)
         {
             int id = GL.CreateShader(type);
@@ -242,7 +241,6 @@ void main()
             return id;
         }
 
-        // Link program
         private static int LinkProgram(int vertId, int fragId)
         {
             int program = GL.CreateProgram();
@@ -270,13 +268,11 @@ void main()
             win.MakeCurrent();
             GL.Viewport(0,0,width,height);
 
-            // compile & link
             int vertId = CompileShader(VertexSrc, ShaderType.VertexShader);
             int fragId = CompileShader(FragmentSrc, ShaderType.FragmentShader);
             int programId = LinkProgram(vertId, fragId);
             GL.UseProgram(programId);
 
-            // quad VAO/VBO/EBO
             int vao = GL.GenVertexArray();
             int vbo = GL.GenBuffer();
             int ebo = GL.GenBuffer();
@@ -289,7 +285,6 @@ void main()
             GL.BufferData(BufferTarget.ElementArrayBuffer, QuadIdxs.Length * sizeof(uint), QuadIdxs, BufferUsageHint.StaticDraw);
             GL.BindVertexArray(0);
 
-            // camera matrices
             camera.Normalize();
             var view = Matrix4.LookAt(
                 new Vector3(camera.Position.X, camera.Position.Y, camera.Position.Z),
@@ -304,7 +299,6 @@ void main()
             Matrix4 invViewProj;
             Matrix4.Invert(view * proj, out invViewProj);
 
-            // set uniforms (first cloud only)
             if(_geometries.Length > 0 && _geometries[0] is SingleScatterCloud ssc)
             {
                 GL.UniformMatrix4(GL.GetUniformLocation(programId, "uInvViewProj"), false, ref invViewProj);
@@ -313,27 +307,24 @@ void main()
                 GL.Uniform1(GL.GetUniformLocation(programId, "uBaseDensity"), ssc.BaseDensity);
                 GL.Uniform4(GL.GetUniformLocation(programId, "uCloudColor"), new Vector4(ssc.CloudColor.Red, ssc.CloudColor.Green, ssc.CloudColor.Blue, ssc.CloudColor.Alpha));
             }
-            // light
+            
             System.Numerics.Vector3 sysLp = _lights.Length > 0
                 ? _lights[0].Position
                 : new System.Numerics.Vector3();
             var lp = new OpenTK.Mathematics.Vector3(sysLp.X, sysLp.Y, sysLp.Z);
 
-// then upload to the shader
             GL.Uniform3(
                 GL.GetUniformLocation(programId, "uLightPos"),
                 lp
             );
-            // step & planes
             float step = 0.4f;
             if (_geometries.Length > 0 && _geometries[0] is SingleScatterCloud sc)
             {
-                // Choose quality factor: smaller = more detail, bigger = faster but chunkier
-                const float qualityDivisor = 8.0f; // tweak 6-10 to taste
+                const float qualityDivisor = 8.0f;
 
                 var axes = sc.Axes;
                 step = Math.Min(axes.X, Math.Min(axes.Y, axes.Z));
-                step = Math.Clamp(step, 0.2f, 20.0f); // avoid crazy small/large steps
+                step = Math.Clamp(step, 0.2f, 20.0f);
                 Console.WriteLine(step);
             }
 

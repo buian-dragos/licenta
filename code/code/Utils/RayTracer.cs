@@ -2,8 +2,6 @@ using System;
 using SkiaSharp;
 using System.Numerics;
 using code.Models;
-// using Color = System.Drawing.Color;
-
 
 namespace code.Utils
 {
@@ -48,7 +46,6 @@ namespace code.Utils
 
         private bool IsLit(Vector3 point, Light light, Geometry currentGeometry = null)
         {
-            // Calculate the direction and distance to the light
             Vector3 lightDir = (light.Position - point);
             float maxDist = lightDir.Length();
             lightDir = Vector3.Normalize(lightDir);
@@ -57,7 +54,6 @@ namespace code.Utils
             float bias = 0.001f;
             Vector3 shadowOrigin = point + lightDir * bias;
 
-            // Shadow ray from the slightly offset origin
             Line shadowRay = new Line(shadowOrigin, shadowOrigin + lightDir * maxDist);
 
             // Check if any geometry obstructs the light
@@ -71,11 +67,11 @@ namespace code.Utils
 
                 if (shadowIntersection.Valid && shadowIntersection.Visible)
                 {
-                    return false;  // Light is obstructed, point is in shadow
+                    return false; 
                 }
             }
 
-            return true;  // No obstructions, point is lit
+            return true;
         }
 
         private Color PhongReflection(Intersection intersection, Vector3 cameraPos)
@@ -109,15 +105,13 @@ namespace code.Utils
         {
             camera.Normalize();
             
-            var background = new Color(0.05f, 0.05f, 0.05f, 1.0f); // Updated background color to #2E2E2E
-            // var background = new Color(0.529f, 0.808f, 0.922f, 1.0f); // Sky blue background
+            var background = new Color(0.05f, 0.05f, 0.05f, 1.0f);
             var image = new Image(width, height);
 
             double pixelWidth = camera.ViewPlaneWidth / width;
             double pixelHeight = camera.ViewPlaneHeight / height;
 
             Vector3 tempCamera = camera.Position + camera.Direction * camera.ViewPlaneDistance;
-            // Vector3 right = (camera.Direction ^ camera.Up).Normalize();
             Vector3 right = Vector3.Normalize(Vector3.Cross(camera.Direction, camera.Up));
             Vector3 up = Vector3.Normalize(camera.Up);
 
@@ -138,16 +132,11 @@ namespace code.Utils
                     {
                         if (intersection.Geometry is SingleScatterCloud)
                         {
-                            Color cloudColor = intersection.Color; // .RGB is pre-multiplied, .Alpha is overall opacity
+                            Color cloudColor = intersection.Color;
                             float overallCloudOpacity = cloudColor.Alpha;
 
-                            // Blend pre-multiplied cloud color with background:
-                            // FinalColor.RGB = PremultipliedCloud.RGB + Background.RGB * (1 - OverallCloudOpacity)
-                            // The Color class operators achieve this:
                             pixelColor = cloudColor + (background * (1.0f - overallCloudOpacity));
-
-                            // The pixelColor.Alpha resulting from the above operation is already 1.0f.
-                            // Explicitly setting it ensures the output image pixel is fully opaque.
+                            
                             pixelColor.Alpha = 1.0f; 
                         }
                         else

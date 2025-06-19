@@ -12,7 +12,7 @@ namespace code.ViewModels
 {
     public partial class CloudLibraryViewModel : ViewModelBase
     {
-        private readonly ICloudService? _cloudService; // Nullable for design-time
+        private readonly ICloudService? _cloudService;
         private readonly Action? _onCancel;
         private readonly Action<Cloud>? _onDisplayCloud;
 
@@ -36,10 +36,9 @@ namespace code.ViewModels
         private const int PageSize = 4;
 
         public bool IsStatusMessageVisible => !string.IsNullOrEmpty(StatusMessage);
-        public bool AreCloudItemsVisible => !IsLoading && string.IsNullOrEmpty(StatusMessage); // Or rather !IsStatusMessageVisible
+        public bool AreCloudItemsVisible => !IsLoading && string.IsNullOrEmpty(StatusMessage);
         public bool IsPaginationVisible => !IsLoading && TotalPages > 1;
 
-        // Design-time constructor
         public CloudLibraryViewModel()
         {
             if (Avalonia.Controls.Design.IsDesignMode)
@@ -55,15 +54,12 @@ namespace code.ViewModels
                 };
                 CurrentPage = 1;
                 UpdatePagedCloudItems();
-                 // Explicitly trigger property changed for calculated properties if needed after setup
                 OnPropertyChanged(nameof(IsStatusMessageVisible));
                 OnPropertyChanged(nameof(AreCloudItemsVisible));
             }
             else
             {
-                // This should ideally not be called by runtime DI without parameters
-                // Or throw if _cloudService is null when not in design mode.
-                 _isLoading = true; // Default for runtime
+                 _isLoading = true;
                  _statusMessage = "Initializing...";
             }
         }
@@ -73,7 +69,6 @@ namespace code.ViewModels
             _cloudService = cloudService ?? throw new ArgumentNullException(nameof(cloudService));
             _onCancel = onCancel;
             _onDisplayCloud = onDisplayCloud ?? throw new ArgumentNullException(nameof(onDisplayCloud));
-            // Initial load is triggered by InitializeAsync
         }
 
         private void UpdatePagedCloudItems()
@@ -93,7 +88,7 @@ namespace code.ViewModels
                 CloudItems.Add(vm);
             }
 
-            if (!_allCloudItemsCache.Any() && !Avalonia.Controls.Design.IsDesignMode) // Don't show "No clouds" in design mode if we have design items
+            if (!_allCloudItemsCache.Any() && !Avalonia.Controls.Design.IsDesignMode)
             {
                 StatusMessage = "No clouds found in the library.";
             }
@@ -101,11 +96,10 @@ namespace code.ViewModels
             {
                 StatusMessage = $"No clouds on page {CurrentPage}. Try a different page.";
             }
-            else if (!Avalonia.Controls.Design.IsDesignMode || _allCloudItemsCache.Any()) // Clear status if clouds are loaded or design items exist
+            else if (!Avalonia.Controls.Design.IsDesignMode || _allCloudItemsCache.Any())
             {
                 StatusMessage = string.Empty;
             }
-            // For design mode, status message is set in constructor
         }
 
         [RelayCommand]
@@ -200,10 +194,7 @@ namespace code.ViewModels
         {
             if (cloudItem == null) return;
 
-            // Optional: Add a confirmation dialog here before deleting
-            // For now, we proceed directly with deletion.
-
-            IsLoading = true; // Use IsLoading to disable other actions during delete
+            IsLoading = true;
             StatusMessage = $"Deleting cloud '{cloudItem.Name}'...";
 
             try
@@ -211,16 +202,13 @@ namespace code.ViewModels
                 await _cloudService.DeleteCloudAsync(cloudItem.Id);
                 StatusMessage = $"Cloud '{cloudItem.Name}' deleted successfully.";
 
-                // Remove from cache
                 var itemToRemove = _allCloudItemsCache.FirstOrDefault(c => c.Id == cloudItem.Id);
                 if (itemToRemove != null)
                 {
                     _allCloudItemsCache.Remove(itemToRemove);
                 }
 
-                // Refresh the current page view
                 UpdatePagedCloudItems(); 
-                // If the current page becomes empty and it wasn't the first page, try to go to previous page
                 if (!CloudItems.Any() && CurrentPage > 1)
                 {
                     CurrentPage--;
@@ -240,11 +228,10 @@ namespace code.ViewModels
 
         public async Task InitializeAsync()
         {
-            if (!Avalonia.Controls.Design.IsDesignMode) // Don't load from service in design mode
+            if (!Avalonia.Controls.Design.IsDesignMode)
             {
                 await LoadCloudsAsync();
             }
-            // Ensure pagination visibility is updated after initial load or design mode setup
             OnPropertyChanged(nameof(IsPaginationVisible));
         }
 
@@ -260,7 +247,7 @@ namespace code.ViewModels
             PreviousPageCommand.NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(AreCloudItemsVisible));
             OnPropertyChanged(nameof(IsStatusMessageVisible));
-            OnPropertyChanged(nameof(IsPaginationVisible)); // Update pagination visibility
+            OnPropertyChanged(nameof(IsPaginationVisible));
         }
 
         partial void OnCurrentPageChanged(int value)
@@ -273,7 +260,7 @@ namespace code.ViewModels
         {
             NextPageCommand.NotifyCanExecuteChanged();
             PreviousPageCommand.NotifyCanExecuteChanged();
-            OnPropertyChanged(nameof(IsPaginationVisible)); // Update pagination visibility
+            OnPropertyChanged(nameof(IsPaginationVisible));
         }
     }
 }

@@ -2,9 +2,6 @@ using System;
 
 namespace code.Models
 {
-    /// <summary>
-    /// Enumerates the supported cloud types.
-    /// </summary>
     public enum CloudType
     {
         Cumulonimbus,
@@ -25,7 +22,7 @@ namespace code.Models
         Quality
     }
 
-    public enum RenderEngineType // New Enum
+    public enum RenderEngineType
     {
         CPU,
         GPU
@@ -51,7 +48,7 @@ namespace code.Models
 
         public RenderingPreset RenderingPreset { get; set; }
         
-        public RenderEngineType RenderEngine { get; set; } // New Property
+        public RenderEngineType RenderEngine { get; set; }
 
         public DateTime CreatedAt { get; set; }
         
