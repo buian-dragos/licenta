@@ -30,10 +30,6 @@ namespace code.ViewModels
             OnPropertyChanged(nameof(CanGeneratePreview));
         }
 
-
-        [ObservableProperty]
-        private DateTimeOffset _createdDate = DateTimeOffset.Now;
-
         // 0 = SingleScatter, 1 = MultipleScatter, 2 = VolumetricRender (or cloud types)
         [ObservableProperty]
         private int _cloudTypeIndex = 0;
@@ -450,7 +446,6 @@ namespace code.ViewModels
                 var cloud = new Cloud
                 {
                     Name = $"Preview_{DateTime.Now:yyyyMMdd_HHmmss}",
-                    CreatedAt = CreatedDate.DateTime,
                     Type = (CloudType)CloudTypeIndex,
                     Altitude = Altitude,
                     Pressure = Pressure,
@@ -492,7 +487,6 @@ namespace code.ViewModels
                 var cloud = new Cloud
                 {
                     Name = $"Cloud_{DateTime.Now:yyyyMMdd_HHmmss}",
-                    CreatedAt = CreatedDate.DateTime,
                     Type = (CloudType)CloudTypeIndex,
                     Altitude = Altitude,
                     Pressure = Pressure,
