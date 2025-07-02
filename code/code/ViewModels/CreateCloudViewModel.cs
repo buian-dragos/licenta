@@ -73,8 +73,27 @@ namespace code.ViewModels
         [ObservableProperty]
         private string? _previewImagePath;
 
+        [ObservableProperty]
+        private bool _isRenderComplete;
+        
+        [ObservableProperty]
+        private double _renderProgress;    // 0–100
+
+        [ObservableProperty]
+        private bool _isRendering;
+
+        
+        public bool HasPreview => PreviewImage != null;
+
+        partial void OnPreviewImageChanged(Bitmap value)
+        {
+            OnPropertyChanged(nameof(HasPreview));
+        }
+
+
         // Cloud Type Toggle Button Properties
         private bool _isCumulonimbusSelected;
+        
         public bool IsCumulonimbusSelected
         {
             get => _isCumulonimbusSelected;
@@ -416,6 +435,11 @@ namespace code.ViewModels
         [RelayCommand]
         private async Task GeneratePreviewAsync()
         {
+            PreviewImage = null;
+            PreviewImagePath = null;
+            
+            PreviewImage?.Dispose();
+            
             IsPreviewLoading = true;
             StatusMessage = string.Empty;
 
@@ -456,6 +480,9 @@ namespace code.ViewModels
         private async Task RenderCloudAsync()
         {
             StatusMessage = string.Empty;
+            
+            RenderProgress = 0;
+            IsRendering = true;
 
             try
             {
@@ -475,22 +502,32 @@ namespace code.ViewModels
                     RenderingPreset = (RenderingPreset)RenderingPresetIndex,
                     RenderEngine = (RenderEngineType)RenderEngineIndex // Set RenderEngine for full render
                 };
-
+                
                 // Persist and render
                 await _cloudService.AddCloudAsync(cloud);
                 // var frames = await _cloudService.RenderCloudAnimationAsync(cloud);
 
                 int nFrames = RenderingPresetIndex == 0 ? 36 : 360; // 0=Fast, 1=Quality
-                var frames = await _cloudService.RenderCloudAnimationAsync(cloud, nFrames: nFrames);
 
-                
+                var progress = new Progress<double>(p => RenderProgress = p * 100);
+
+                var frames = await _cloudService.RenderCloudAnimationAsync(cloud, nFrames: nFrames, progress: progress);
+
+
+
+
                 // Update preview
                 PreviewImagePath = cloud.PreviewImagePath;
                 StatusMessage = $"Rendered {frames.Length} frames successfully.";
+                IsRenderComplete = true;
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Error rendering cloud: {ex.Message}";
+            }
+            finally
+            {
+                IsRendering = false;
             }
         }
 
@@ -498,6 +535,12 @@ namespace code.ViewModels
         private void NavigateToStartPage()
         {
             _onCancel?.Invoke();
+        }
+        
+        [RelayCommand]
+        private void CloseRenderCompletePopup()
+        {
+            IsRenderComplete = false;
         }
         
         [RelayCommand]

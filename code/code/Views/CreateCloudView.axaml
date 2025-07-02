@@ -404,7 +404,8 @@
           ClipToBounds="True">
           <Image
             Source="{Binding PreviewImage}"
-            Stretch="Uniform"/>
+            Stretch="Uniform"
+            IsVisible="{Binding HasPreview}"/>
         </Border>
 
         <Button
@@ -421,6 +422,17 @@
           HorizontalAlignment="Center"
           Margin="0,8,0,0"/>
       </StackPanel>
+      
+      <ProgressBar
+        Grid.Row="2"
+        Grid.ColumnSpan="2"
+        Minimum="0"
+        Maximum="100"
+        Value="{Binding RenderProgress}"  
+        Height="4"
+        VerticalAlignment="Top"
+        Margin="0,0,0,0"
+        IsVisible="{Binding IsRendering}"/>
 
       <!-- ─────────── Row 2: Render Button ─────────── -->
       <Button
@@ -439,6 +451,44 @@
         Margin="0,24,0,0"
         HorizontalAlignment="Center"
         Width="400"/>
+
+      <!-- ─────────── Render Complete Popup ─────────── -->
+      <Panel
+        Grid.Row="0" Grid.RowSpan="3"
+        Grid.Column="0" Grid.ColumnSpan="2"
+        IsVisible="{Binding IsRenderComplete}"
+        Background="#80000000"> <!-- Semi-transparent background -->
+
+        <Border
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          Background="#2E2E2E"
+          CornerRadius="12"
+          Padding="24"
+          Width="300">
+          <StackPanel Spacing="16">
+            <TextBlock
+              Text="Render Complete"
+              Foreground="White"
+              FontSize="20"
+              FontWeight="Bold"
+              HorizontalAlignment="Center"/>
+            <TextBlock
+              Text="Your cloud has been successfully rendered and saved to the library."
+              Foreground="White"
+              TextWrapping="Wrap"
+              HorizontalAlignment="Center"/>
+            <Button
+              Content="Close"
+              Command="{Binding CloseRenderCompletePopupCommand}"
+              HorizontalAlignment="Center"
+              Background="#2563EB"
+              Foreground="White"
+              Padding="12,8"
+              CornerRadius="6"/>
+          </StackPanel>
+        </Border>
+      </Panel>
     </Grid>
   </ScrollViewer>
 </UserControl>

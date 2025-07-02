@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Threading;
+using Avalonia.Threading;
 using code.Models;
 using code.Repositories;
 using code.Utils;
@@ -50,7 +52,7 @@ namespace code.Services
             Directory.CreateDirectory(cloudFramesPath);
         }
 
-        public async Task<string[]> RenderCloudAnimationAsync(Cloud cloud, int nFrames = 36, int width = 800, int height = 600, bool noLights = false) {
+        public async Task<string[]> RenderCloudAnimationAsync(Cloud cloud, int nFrames = 36, int width = 800, int height = 600, bool noLights = false, IProgress<double>? progress = null) {
             var persistedCloud = await GetCloudByIdAsync(cloud.Id);
             if (persistedCloud == null || string.IsNullOrEmpty(persistedCloud.StoragePath))
             {
@@ -99,6 +101,7 @@ namespace code.Services
             {
                 for (int i = 0; i < nFrames; i++)
                 {
+                    
                     filenames[i] = Path.Combine(cloudFramesPath, $"cloud_frame_{i + 1:000}.png");
 
                     float angleRad = (float)(angleStep * i * Math.PI / 180.0);
@@ -118,11 +121,18 @@ namespace code.Services
                     Console.WriteLine($"[CloudService] Rendering (GPU) frame {i + 1}/{nFrames}, cloud {cloud.Id}. Output: {filenames[i]}");
                     localRenderer.Render(camera, width, height, filenames[i]);
                     Console.WriteLine($"Frame {i + 1}/{nFrames} for cloud {cloud.Id} completed: {filenames[i]}");
+                    
+                    progress?.Report( (i + 1) / (double)nFrames );
+                    
+                    await Dispatcher.UIThread.InvokeAsync(
+                        () => { /* no-op */ },
+                        DispatcherPriority.Background);
                 }
             }
             else
             {
                 // Parallel rendering for CPU-based renderer
+                int completed = 0;
                 var tasks = new List<Task>();
                 for (int i = 0; i < nFrames; i++)
                 {
@@ -150,6 +160,10 @@ namespace code.Services
                         Console.WriteLine($"[CloudService] Attempting to render frame {idx + 1} for cloud {cloud.Id} using {localRenderer.GetType().Name}. Output: {filenames[idx]}");
                         localRenderer.Render(camera, width, height, filenames[idx]);
                         Console.WriteLine($"Frame {idx + 1}/{nFrames} for cloud {cloud.Id} completed: {filenames[idx]}");
+                        
+                        var done = Interlocked.Increment(ref completed);
+                        progress?.Report( done / (double)nFrames );
+                        
                     }));
                 }
                 await Task.WhenAll(tasks);
@@ -248,5 +262,7 @@ namespace code.Services
             };
     }
 }
+
+
 
 
