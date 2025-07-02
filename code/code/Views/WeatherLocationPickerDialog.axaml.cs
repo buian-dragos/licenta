@@ -35,12 +35,11 @@ namespace code.Views
             map.Layers.Add(_markerLayer);
 
             MapControl.Map = map;
-            
 
-            map.Navigator.FlyTo(center: initialCenter, maxResolution: initialResolution);
+            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(lon, lat).ToMPoint();
             
-            map.Home = navigator => navigator.FlyTo(center: initialCenter, maxResolution: initialResolution);
-            
+            map.Home = n => n.CenterOnAndZoomTo(sphericalMercatorCoordinate, 2000);
+
             MapControl.Refresh();
     
             MapControl.Info += MapControl_Info;
