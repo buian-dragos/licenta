@@ -73,11 +73,13 @@ namespace code.ViewModels
         private bool _isRenderComplete;
         
         [ObservableProperty]
-        private double _renderProgress;    // 0–100
+        private double _renderProgress;
 
         [ObservableProperty]
         private bool _isRendering;
 
+        [ObservableProperty]
+        private string _altitudeWarning;
         
         public bool HasPreview => PreviewImage != null;
 
@@ -310,6 +312,60 @@ namespace code.ViewModels
                     OnPropertyChanged(nameof(IsGpuRenderEngineSelected));
                 }
             }
+        }
+        
+        // inside CreateCloudViewModel
+        partial void OnCloudTypeIndexChanged(int value)
+        {
+            // set Altitude to the WMO minimum for the selected cloud
+            Altitude = value switch
+            {
+                0 => 500,   // Cumulonimbus
+                1 => 200,   // Cumulus
+                2 => 0,     // Stratus
+                3 => 500,   // Stratocumulus
+                4 => 500,   // Nimbostratus
+                5 => 2000,  // Altostratus
+                6 => 2000,  // Altocumulus
+                7 => 6000,  // Cirrostratus
+                8 => 6000,  // Cirrocumulus
+                9 => 4000,  // Cirrus
+                _ => Altitude
+            };
+        }
+
+        partial void OnAltitudeChanged(double value)
+            => ValidateAltitude();
+
+        private void ValidateAltitude()
+        {
+            // lookup min/max for current cloud
+            (double min, double max) = CloudTypeIndex switch
+            {
+                0 => (500,   16000),  // Cumulonimbus
+                1 => (200,   2000),   // Cumulus
+                2 => (0,     2000),   // Stratus
+                3 => (500,   2000),   // Stratocumulus
+                4 => (500,   5500),   // Nimbostratus
+                5 => (2000,  8000),   // Altostratus
+                6 => (2000,  7000),   // Altocumulus
+                7 => (6000,  13000),  // Cirrostratus
+                8 => (6096,  15000),  // Cirrocumulus
+                9 => (4000,  20000),  // Cirrus
+                _ => (double.NaN, double.NaN)
+            };
+
+            if (double.IsNaN(min))
+            {
+                AltitudeWarning = string.Empty;
+                return;
+            }
+
+            if (Altitude < min || Altitude > max)
+                AltitudeWarning = 
+                    $"⚠️ Altitude for {(CloudType)CloudTypeIndex} should be {min}–{max} m.";
+            else
+                AltitudeWarning = string.Empty;
         }
 
         // Helper method to deselect all cloud types except the one specified

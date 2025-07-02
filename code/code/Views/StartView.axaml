@@ -38,7 +38,7 @@
 
             <!-- “Open cloud library” button -->
             <Button
-                Content="Open cloud library"
+                Content="Open Cloud Library"
                 Command="{Binding NavigateToCloudLibraryCommand}"
                 FontSize="20"
                 FontWeight="SemiBold"

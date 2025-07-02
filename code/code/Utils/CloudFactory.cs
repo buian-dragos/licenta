@@ -21,9 +21,9 @@ namespace code.Utils
                     break;
 
                 case CloudType.Cumulonimbus:          
-                    axes     = new Vector3(45, 35, 35);
-                    baseDens = 0.18f;
-                    tint     = new Color(0.52f, 0.52f, 0.57f, 0.85f);
+                    axes     = new Vector3(30, 60, 30);
+                    baseDens = 0.14f;
+                    tint     = new Color(0.62f, 0.62f, 0.67f, 0.80f);
                     break;
 
                 case CloudType.Stratus:
@@ -57,9 +57,9 @@ namespace code.Utils
                     break;
                 
                 case CloudType.Cirrus:
-                    axes     = new Vector3(60, 6, 45);
-                    baseDens = 0.04f;
-                    tint     = new Color(0.92f, 0.97f, 1.0f, 0.4f);
+                    axes     = new Vector3(55, 12, 35);
+                    baseDens = 0.03f;
+                    tint     = new Color(0.92f, 0.97f, 1.0f, 0.25f);
                     break;
 
                 case CloudType.Cirrostratus:

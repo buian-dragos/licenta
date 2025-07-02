@@ -9,7 +9,7 @@
 
   <!-- ScrollViewer in case the window is smaller than content -->
   <ScrollViewer>
-
+  
     <!-- Root Grid: Row0=Header, Row1=MainContent, Row2=RenderButton -->
     <Grid
       Margin="24"
@@ -190,7 +190,17 @@
               Foreground="White"
               CornerRadius="6"
               Padding="8"
-              Width="150"/>
+              Width="150"
+              />
+            
+            <Canvas Width="150" Height="16" ClipToBounds="False" Margin="0,2,0,0">
+              <TextBlock
+                Text="{Binding AltitudeWarning}"
+                Foreground="Orange"
+                FontSize="12"
+                Canvas.Left="0"
+                Canvas.Top="0"/>
+            </Canvas>
           </StackPanel>
 
           <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,16">
