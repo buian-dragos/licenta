@@ -26,12 +26,15 @@
           Foreground="White"
           Padding="8,4"
           CornerRadius="6"
+          HorizontalContentAlignment="Center"
+          VerticalContentAlignment="Center"
           HorizontalAlignment="Left"/>
         <TextBlock
           Grid.Column="1"
           Text="Cloud Library"
           Foreground="White"
-          FontSize="18"
+          FontSize="32"
+          FontWeight="Bold"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"/>
         <!-- Optional: Add a refresh button or loading indicator here -->

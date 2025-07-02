@@ -15,7 +15,7 @@
 
             <!-- Title -->
             <TextBlock
-                Text="Raytracing: Cloud Rendering"
+                Text="Cloud Rendering"
                 Foreground="White"
                 FontSize="32"
                 FontWeight="Bold"

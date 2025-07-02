@@ -243,7 +243,7 @@ namespace code.Services
                     new Color(1f, 1f, 1f, 1f),
                     new Color(1f, 1f, 1f, 1f),
                     new Color(1f, 1f, 1f, 1f),
-                    10.0f
+                    1.0f
                 )
             };
     }
